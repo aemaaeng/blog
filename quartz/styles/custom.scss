@@ -1,3 +1,181 @@
 @use "./variables.scss" as *;
 
-// put your custom CSS here!
+// Pretendard (한글 웹폰트) 불러오기 — @font-face 는 위치 제약이 없음
+@font-face {
+  font-family: "Pretendard Variable";
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/woff2/PretendardVariable.woff2")
+    format("woff2-variations");
+}
+
+// ── 포인트 색(accent)을 로즈핑크로 ──
+// things 테마는 모든 강조색을 --accent-h/s/l/d 에서 파생시킴.
+// 셀렉터 특이도를 테마(:root:root)보다 높여( :root:root:root ) 확실히 덮음.
+:root:root:root[saved-theme="light"] {
+  --accent-h: 336;
+  --accent-s: 72%;
+  --accent-l: 55%; // 흰 배경에서 링크가 읽히도록 살짝 진하게
+  --accent-d: 64%;
+}
+
+:root:root:root[saved-theme="dark"] {
+  --accent-h: 337;
+  --accent-s: 78%;
+  --accent-l: 62%;
+  --accent-d: 72%; // 어두운 배경에서 링크는 밝은 핑크로
+}
+
+// ── 한글 폰트를 Pretendard로 ──
+$kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
+  "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+
+:root:root:root {
+  --font-text: #{$kr};
+  --bodyFont: #{$kr};
+  --headerFont: #{$kr};
+
+  // things 는 h3 를 파란색으로 하드코딩함 → 일반 제목색으로 통일(튀는 파랑 제거)
+  --h3-color: var(--text-normal);
+}
+
+// ── 중앙 1단 레이아웃 ──
+// 기본 그리드가 좌 320px · 중앙 · 우 320px 라 사이드바를 비워도 자리를 차지함.
+// 단일 컬럼으로 재정의하고 가운데 정렬.
+:root:root:root .page > #quartz-body {
+  // 가운데 행(center)이 남는 공간을 채워 푸터를 바닥에 고정(sticky footer)
+  grid-template:
+    "grid-header" auto
+    "grid-center" 1fr
+    "grid-footer" auto / minmax(0, 1fr) !important;
+  min-height: 100vh;
+  max-width: 760px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 24px !important;
+  gap: 0 !important;
+}
+
+// .page 자체도 중앙 정렬 보장
+:root:root:root .page {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+// 비어버린 좌·우 사이드바 자리 제거
+:root:root:root .sidebar.left,
+:root:root:root .sidebar.right {
+  display: none !important;
+}
+
+// 상단 마스트헤드: 사이트 제목(크게) + 검색줄
+:root:root:root .page-title {
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  margin: 4px 0 14px;
+}
+:root:root:root .search {
+  margin-bottom: 6px;
+}
+// 사이트 헤더와 본문(글 제목)을 구분선으로 분리
+:root:root:root .article-title {
+  margin-top: 30px;
+  padding-top: 26px;
+  border-top: 1px solid var(--lightgray);
+}
+
+// ── 검색바: 투박한 박스 → 가볍고 부드럽게 ──
+:root:root:root .search-button {
+  background: transparent;
+  border: 1px solid var(--lightgray);
+  border-radius: 999px;
+  padding: 5px 14px;
+  min-width: 0;
+  width: fit-content;
+  gap: 7px;
+  color: var(--gray);
+  font-size: 0.85rem;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+:root:root:root .search-button:hover {
+  border-color: var(--gray);
+  color: var(--dark);
+}
+:root:root:root .search-button p {
+  margin: 0;
+  display: inline;
+}
+:root:root:root .search-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+// ── 헤딩 두께 전체적으로 낮추기(Pretendard 가변) ──
+:root:root:root .page-title {
+  font-weight: 640;
+}
+:root:root:root .article-title,
+:root:root:root article h1 {
+  font-weight: 640;
+}
+:root:root:root article h2 {
+  font-weight: 600;
+}
+:root:root:root article h3,
+:root:root:root .graph h3,
+:root:root:root article h4 {
+  font-weight: 600;
+}
+
+// 그래프 뷰 높이 축소(전체 화면 절반씩 먹지 않게) + 부드러운 접힘
+:root:root:root .graph > .graph-outer {
+  height: 320px;
+  max-height: 340px;
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.22s ease,
+    margin 0.3s ease;
+}
+// 접힌 상태: 높이 0으로 부드럽게(하단이 툭 튀지 않게)
+:root:root:root .graph.is-collapsed > .graph-outer {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+// 첫 렌더 시엔 애니메이션 없이 즉시 적용
+:root:root:root .graph.no-anim > .graph-outer {
+  transition: none;
+}
+
+// 그래프 제목: 노션 토글처럼 클릭 가능하게
+:root:root:root .graph h3 {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+}
+:root:root:root .graph-caret {
+  font-size: 0.72em;
+  color: var(--gray);
+  line-height: 1;
+}
+
+// 테마가 요소에 직접 font-family 를 걸어도 이기도록 안전망
+:root:root:root body,
+:root:root:root p,
+:root:root:root li,
+:root:root:root article,
+:root:root:root .center,
+:root:root:root h1,
+:root:root:root h2,
+:root:root:root h3,
+:root:root:root h4,
+:root:root:root .page-title {
+  font-family: $kr;
+}

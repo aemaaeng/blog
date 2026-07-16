@@ -106,6 +106,11 @@ export default (() => {
             return resource
           }
         })}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var KEY="graph-collapsed",TITLE="Graph";function setup(){document.querySelectorAll(".graph").forEach(function(graph){var title=graph.querySelector("h3");var outer=graph.querySelector(".graph-outer");if(!title||!outer)return;if(title.dataset.toggleBound==="true")return;title.dataset.toggleBound="true";title.textContent="";var caret=document.createElement("span");caret.className="graph-caret";var label=document.createElement("span");label.textContent=TITLE;title.append(caret,label);function apply(c,animate){if(!animate)graph.classList.add("no-anim");if(c){graph.classList.add("is-collapsed");}else{graph.classList.remove("is-collapsed");}caret.textContent=c?"\\u25B8":"\\u25BE";if(!animate)requestAnimationFrame(function(){graph.classList.remove("no-anim");});}apply(localStorage.getItem(KEY)==="true",false);title.addEventListener("click",function(){var now=!graph.classList.contains("is-collapsed");apply(now,true);localStorage.setItem(KEY,String(now));});});}document.addEventListener("nav",setup);document.addEventListener("DOMContentLoaded",setup);})();`,
+          }}
+        />
       </head>
     )
   }
