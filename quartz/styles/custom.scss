@@ -72,7 +72,7 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
 
 // 상단 마스트헤드: 사이트 제목(크게) + 검색줄
 :root:root:root .page-title {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   letter-spacing: -0.02em;
   margin: 4px 0 14px;
 }
@@ -84,6 +84,21 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   margin-top: 30px;
   padding-top: 26px;
   border-top: 1px solid var(--lightgray);
+}
+
+// 글 상세의 날짜/읽기시간(content-meta) 작게
+:root:root:root .content-meta {
+  font-size: 0.85rem;
+}
+
+// ── 글 목록에서 404 페이지 항목만 숨기기 (모든 페이지의 목록에서) ──
+:root:root:root .recent-notes .recent-li:has(a[href$="404"]) {
+  display: none;
+}
+
+// ── hover 미리보기(팝오버) 상단 패딩(기본 top=0이라 내용이 붙음) ──
+:root:root:root .popover > .popover-inner {
+  padding-top: 0.85rem;
 }
 
 // ── 검색바: 투박한 박스 → 가볍고 부드럽게 ──
@@ -112,21 +127,43 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   height: 14px;
 }
 
-// ── 헤딩 두께 전체적으로 낮추기(Pretendard 가변) ──
+// ── 헤딩 두께 + 크기 전체적으로 낮추기(Pretendard 가변) ──
 :root:root:root .page-title {
   font-weight: 640;
 }
-:root:root:root .article-title,
+:root:root:root .article-title {
+  font-size: 1.4rem;
+  font-weight: 640;
+}
 :root:root:root article h1 {
+  font-size: 1.4rem;
   font-weight: 640;
 }
 :root:root:root article h2 {
+  font-size: 1.2rem;
   font-weight: 600;
 }
 :root:root:root article h3,
-:root:root:root .graph h3,
-:root:root:root article h4 {
+:root:root:root .graph h3 {
+  font-size: 1.05rem;
   font-weight: 600;
+}
+:root:root:root article h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+// 홈 글 목록의 제목들(afterBody라 article 스코프 밖 → 별도 지정)
+:root:root:root .recent-notes > h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+:root:root:root .recent-notes .recent-li h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+// 목록 항목의 날짜(meta)도 작게
+:root:root:root .recent-notes .recent-li .meta {
+  font-size: 0.8rem;
 }
 
 // 그래프 뷰 높이 축소(전체 화면 절반씩 먹지 않게) + 부드러운 접힘
