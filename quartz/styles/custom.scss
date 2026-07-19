@@ -101,6 +101,81 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   padding-top: 0.85rem;
 }
 
+// ── 태그(tag-list) pill: 노랑 배경 → 연핑크 ──
+:root:root:root .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  margin: 4px 0 0;
+  list-style: none;
+}
+:root:root:root .tags li {
+  margin: 0;
+  // li 자체 배경/패딩 제거 (안 그러면 a.tag-link pill과 이중 배경)
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+:root:root:root a.tag-link {
+  background: hsl(185, 45%, 92%);
+  color: hsl(188, 46%, 32%);
+  border: none;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.78rem;
+}
+:root:root:root a.tag-link:hover {
+  background: hsl(185, 48%, 87%);
+}
+// "#" (::before)도 텍스트와 같은 색으로 (기본은 초록)
+:root:root:root a.tag-link::before {
+  color: inherit !important;
+}
+:root:root:root[saved-theme="dark"] a.tag-link {
+  background: hsl(188, 35%, 20%);
+  color: hsl(185, 55%, 72%);
+}
+:root:root:root[saved-theme="dark"] a.tag-link:hover {
+  background: hsl(188, 38%, 26%);
+}
+
+// ── note-properties를 "Properties 토글·표" 없이 태그 pill만 보이게 ──
+:root:root:root .note-properties {
+  border: none !important;
+  background: none !important;
+  margin: 6px 0 2px !important;
+  padding: 0 !important;
+}
+// 토글 헤더("Properties"+개수), "tags" 라벨 셀, ", " 구분자 제거
+// (라벨 셀은 표 셀 규칙보다 특이도 높게 지정)
+:root:root:root .note-properties summary,
+:root:root:root .note-properties-table td.note-properties-key,
+:root:root:root .note-properties-separator {
+  display: none !important;
+}
+// 표 레이아웃 해제 → 블록으로 납작하게
+:root:root:root .note-properties-table,
+:root:root:root .note-properties-table tbody,
+:root:root:root .note-properties-table tr,
+:root:root:root .note-properties-table td {
+  display: block !important;
+  border: none !important;
+  padding: 0 !important;
+  background: none !important;
+}
+// 태그들 가로 나열
+:root:root:root .note-properties-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+// ── 다크모드 토글 버튼: 클릭 가능한 커서 ──
+:root:root:root .darkmode {
+  cursor: pointer;
+}
+
 // ── 검색바: 투박한 박스 → 가볍고 부드럽게 ──
 :root:root:root .search-button {
   background: transparent;
@@ -125,6 +200,25 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
 :root:root:root .search-button svg {
   width: 14px;
   height: 14px;
+}
+
+// ── 라이트모드 텍스트 선택(드래그) 색: 더 연하게 (글자는 진하게 → 대비 유지) ──
+:root:root:root:not([saved-theme="dark"]) ::selection {
+  background: color-mix(in srgb, var(--tertiary) 32%, transparent);
+  color: var(--dark);
+}
+
+// ── 본문 볼드: 핑크(accent) 대신 진한 본문색 + grab 커서 제거 ──
+:root:root:root article strong,
+:root:root:root article b {
+  color: var(--dark);
+  cursor: text;
+}
+
+// ── 본문 글자 크기 한 단계 축소(16px → ~15px) ──
+// 헤딩은 rem 절대값이라 영향 없고 본문 텍스트만 작아짐
+:root:root:root article {
+  font-size: 0.94rem;
 }
 
 // ── 헤딩 두께 + 크기 전체적으로 낮추기(Pretendard 가변) ──
@@ -164,6 +258,23 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
 // 목록 항목의 날짜(meta)도 작게
 :root:root:root .recent-notes .recent-li .meta {
   font-size: 0.8rem;
+}
+
+// ── 태그 페이지 목록(.section): 3단 그리드 → 심플 좌측 정렬 + 크기 축소 ──
+:root:root:root .section-li .section {
+  display: block !important;
+}
+:root:root:root .section-li .meta {
+  font-size: 0.8rem;
+  margin: 0 0 2px;
+}
+:root:root:root .section-li .desc h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+:root:root:root .section-li .tags {
+  margin-top: 6px;
 }
 
 // 그래프 뷰 높이 축소(전체 화면 절반씩 먹지 않게) + 부드러운 접힘
