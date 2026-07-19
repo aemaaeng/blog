@@ -118,26 +118,24 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   border-radius: 0 !important;
 }
 :root:root:root a.tag-link {
-  background: hsl(185, 45%, 92%);
-  color: hsl(188, 46%, 32%);
+  background: none;
+  color: hsl(188, 46%, 34%);
   border: none;
-  border-radius: 999px;
-  padding: 2px 10px;
-  font-size: 0.78rem;
+  padding: 0;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
 }
 :root:root:root a.tag-link:hover {
-  background: hsl(185, 48%, 87%);
+  text-decoration-thickness: 2px;
 }
-// "#" (::before)도 텍스트와 같은 색으로 (기본은 초록)
+// "#" (::before)도 텍스트와 같은 색으로
 :root:root:root a.tag-link::before {
   color: inherit !important;
 }
 :root:root:root[saved-theme="dark"] a.tag-link {
-  background: hsl(188, 35%, 20%);
   color: hsl(185, 55%, 72%);
-}
-:root:root:root[saved-theme="dark"] a.tag-link:hover {
-  background: hsl(188, 38%, 26%);
 }
 
 // ── note-properties를 "Properties 토글·표" 없이 태그 pill만 보이게 ──
@@ -168,7 +166,32 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
 :root:root:root .note-properties-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 10px;
+}
+// 본문 태그: pill → 밑줄 형태
+:root:root:root .note-properties a.tag-link {
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+// ── 검색 결과 태그: pill → 밑줄 형태 (태그는 <p> 요소) ──
+:root:root:root .result-card ul.tags li p {
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-weight: 500 !important;
+  color: hsl(188, 46%, 34%) !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+:root:root:root[saved-theme="dark"] .result-card ul.tags li p {
+  color: hsl(185, 55%, 68%) !important;
 }
 
 // ── 다크모드 토글 버튼: 클릭 가능한 커서 ──

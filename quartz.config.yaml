@@ -4,7 +4,6 @@ configuration:
   pageTitleSuffix: ""
   enableSPA: true
   enablePopovers: true
-  analytics: null
   locale: ko-KR
   baseUrl: example.com
   ignorePatterns:
