@@ -53,8 +53,10 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   max-width: 760px !important;
   width: 100% !important;
   margin: 0 auto !important;
-  padding: 0 24px !important;
   gap: 0 !important;
+  // 좌우 여백은 테마가 .center 에 준 패딩(0 24px) 하나에만 맡긴다.
+  // 여기서 패딩을 또 주면 이중이 되어 .center(min-width:100%)가 우측으로 삐져나가
+  // 좌우가 비대칭(좌 40 / 우 8)이 됐었음. 패딩을 안 주면 삐짐·비대칭·가로 오버플로우가 모두 사라짐.
 }
 
 // .page 자체도 중앙 정렬 보장
@@ -76,6 +78,17 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   letter-spacing: -0.02em;
   margin: 4px 0 14px;
 }
+// 사이트 제목(내 이름) = 홈으로 가는 링크. 클릭 가능함이 드러나게.
+:root:root:root .page-title a {
+  color: var(--dark);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+:root:root:root .page-title a:hover {
+  color: var(--secondary);
+}
+
 :root:root:root .search {
   margin-bottom: 6px;
 }
@@ -349,4 +362,30 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
 :root:root:root h4,
 :root:root:root .page-title {
   font-family: $kr;
+}
+
+// ── 모바일(≤800px) 반응형 override (base/desktop 규칙 뒤에 두어 소스순서로 확실히 적용) ──
+// base 는 사이드바 레이아웃 기준이라 모바일에서 .page-title 을 숨기고 .page-header 여백을 없앰.
+// 마스트헤드로 쓰므로 되살리고, 좁은 화면에 맞게 크기·여백을 줄인다.
+@media all and (max-width: 800px) {
+  :root:root:root .page-title {
+    display: block;
+    font-size: 1.2rem;
+  }
+  // 테마가 .page-title a 를 h2 보다 크게(1.7rem) 키우는 걸 되돌림
+  :root:root:root .page-title a {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  :root:root:root .page-header {
+    margin-top: 40px;
+  }
+  :root:root:root .breadcrumb-container {
+    font-size: 0.8rem;
+  }
+  // 마스트헤드↔본문 구분선 여백 축소
+  :root:root:root .article-title {
+    margin-top: 20px;
+    padding-top: 18px;
+  }
 }
