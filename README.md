@@ -1,17 +1,15 @@
-# Quartz v5
+## Personal Wiki
 
-> “[One] who works with the door open gets all kinds of interruptions, but [they] also occasionally gets clues as to what the world is and what might be important.” — Richard Hamming
+A personal knowledge base built with Quartz.  
+Notes for my future self.
 
-Quartz is a set of tools that helps you publish your [digital garden](https://jzhao.xyz/posts/networked-thought) and notes as a website for free.
+🔗 **https://hyemin-jardin.pages.dev**
 
-🔗 Read the documentation and get started: https://quartz.jzhao.xyz/
+## Built with
 
-[Join the Discord Community](https://discord.gg/cRFFHYye7t)
+[Quartz v5](https://quartz.jzhao.xyz) · Obsidian · Cloudflare Pages
 
-## Sponsors
+## License
 
-<p align="center">
-  <a href="https://github.com/sponsors/jackyzha0">
-    <img src="https://cdn.jsdelivr.net/gh/jackyzha0/jackyzha0/sponsorkit/sponsors.svg" />
-  </a>
-</p>
+- 글·이미지 등의 **콘텐츠** © Hyemin Kim
+- **사이트 코드**는 [Quartz](https://github.com/jackyzha0/quartz) (MIT) 기반이며 일부 커스텀을 포함합니다.
