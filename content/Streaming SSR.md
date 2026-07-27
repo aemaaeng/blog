@@ -41,8 +41,7 @@ Disable JavaScript로 확인하면 로딩 ui가 뜨기 때문에 SEO에 영향 �
 ### Streaming SSR과 html 캐싱을 동시에 적용할 수도 있는지?
 ^702051
 
-불가능하다. 스트리밍은 하나의 응답을 chunk로 분리하는 것이라 "이 부분만 캐시"가 성립하지 않는다.
-개인화된 한 줄이 섞이는 순간 문서 전체가 캐시 불가가 된다.
+응답 전체를 캐싱하는 것은 가능한데, 결국은 하나의 응답이기 때문에 응답 중 일부만 캐싱하는 것은 불가능하다. 
 
-이 한계를 푸는 방향이 응답을 쪼개는 것이고, 그게 [[Astro server islands]]다.
-Next.js도 같은 문제를 PPR(Partial Prerendering)로 풀려고 하고 있음. (찾아보고 추가 예정)
+- 응답을 나눈다 → 조각마다 독립 URL이라 각자 캐싱 가능. [[Astro server islands]]
+- 응답 안에서 조립한다 → Next.js PPR(Partial Prerendering, 찾아보고 추가할 예정) 
