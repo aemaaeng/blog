@@ -418,6 +418,54 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   margin-bottom: 0;
 }
 
+// ── 태그 목록(/tags/) 인덱스: 태그마다 글 카드가 통째로 반복돼 산만 → 칩 인덱스로 ──
+// 구조: div(태그블록) > h2>a.tag-link + div.page-listing(> p 건수 + ul.section-ul 글카드)
+// 이 페이지(data-slug="tags/index")에서만 글 카드를 숨기고 "태그명 + 건수"를 칩으로.
+body[data-slug="tags/index"] div:has(> h2 > a.tag-link):has(> .page-listing) {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 7px 14px;
+  margin: 0 8px 10px 0;
+  border: 1px solid var(--lightgray);
+  border-radius: 999px;
+  background: var(--light);
+  vertical-align: top;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+body[data-slug="tags/index"] div:has(> h2 > a.tag-link):has(> .page-listing):hover {
+  border-color: var(--secondary);
+  background: color-mix(in srgb, var(--secondary) 5%, transparent);
+}
+// 태그명 h2 → 헤딩 기본값 제거하고 인라인
+body[data-slug="tags/index"] div:has(> .page-listing) > h2 {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+body[data-slug="tags/index"] div:has(> .page-listing) > h2 a.tag-link {
+  text-decoration: none;
+}
+// page-listing: 건수(p)만 인라인으로 남기고 글 카드(section-ul) 숨김
+body[data-slug="tags/index"] .page-listing {
+  display: inline;
+  margin: 0;
+}
+body[data-slug="tags/index"] .page-listing > p {
+  display: inline;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--gray);
+}
+body[data-slug="tags/index"] .page-listing ul.section-ul {
+  display: none;
+}
+
 // ── 모바일(≤800px) 반응형 override (base/desktop 규칙 뒤에 두어 소스순서로 확실히 적용) ──
 // base 는 사이드바 레이아웃 기준이라 모바일에서 .page-title 을 숨기고 .page-header 여백을 없앰.
 // 마스트헤드로 쓰므로 되살리고, 좁은 화면에 맞게 크기·여백을 줄인다.
