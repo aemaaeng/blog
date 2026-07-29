@@ -12,6 +12,7 @@ https://nextjs.org/docs/app/guides/streaming
 - SEO에 영향을 주는지?
 	- 청크로 받은 콘텐츠가 source html에 포함되어 크롤러도 읽어갈 수 있게 되는 건지?
 - (2026-07-24 추가) Streaming SSR과 html 캐싱을 동시에 적용할 수도 있는지?
+- (2026-07-29 추가) 구현만 하면 알아서 잘 적용되는 걸까?
 
 ### 무엇인지?
 일반 SSR에서는 서버에서 HTML을 다 만들어서 보내주기 때문에 하나의 느린 API 응답이 HTML 응답 자체를 지연시킬 수 있음. 
@@ -45,3 +46,6 @@ Disable JavaScript로 확인하면 로딩 ui가 뜨기 때문에 SEO에 영향 �
 
 - 응답을 나눈다 → 조각마다 독립 URL이라 각자 캐싱 가능. [[Astro server islands]]
 - 응답 안에서 조립한다 → Next.js PPR(Partial Prerendering, 찾아보고 추가할 예정) 
+
+### 구현만 하면 알아서 잘 적용되는 걸까?
+nginx proxy_buffering, X-Accel-Buffering, cloudfront, gzip 압축 등등 인프라도 엮어서 봐야 스트리밍이 잘 적용되는지 알 수 있다. 조사해볼 예정
