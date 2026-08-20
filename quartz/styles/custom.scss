@@ -277,7 +277,29 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
 :root:root:root article h2 {
   font-size: 1.2rem;
   font-weight: 600;
+  // things 테마가 body h2 에 얕은 구분선(border-bottom 2px)을 깔아둠 → 제거
+  border-bottom: none;
+  // 테마가 h2 margin-top 을 0 으로 둬서 위 간격이 앞 요소 margin 에만 의존함.
+  // 앞에 div(임베드) 처럼 마진 없는 요소가 오면 딱 붙어버려 최소 간격을 직접 준다.
+  margin-top: 1.75rem;
 }
+// ── 본문 데모 박스: 실제로 동작하는 예시임을 캡션(data-label)으로 표시 ──
+:root:root:root article .demo {
+  position: relative;
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  padding: 1.7rem 1rem 1rem;
+  margin: 1.25rem 0;
+}
+:root:root:root article .demo::before {
+  content: attr(data-label);
+  position: absolute;
+  top: 0.5rem;
+  left: 0.85rem;
+  font-size: 0.7rem;
+  color: var(--gray);
+}
+
 :root:root:root article h3,
 :root:root:root .graph h3 {
   font-size: 1.05rem;
