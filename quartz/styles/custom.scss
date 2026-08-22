@@ -300,6 +300,74 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   color: var(--gray);
 }
 
+// ── 문서 상단 목차 ──
+// Obsidian Table of Contents 플러그인이 넣어주는 목록을 그대로 잡는다.
+// 본문 첫 <ul> 이면서 항목이 앵커 링크(#...)인 경우만 목차로 간주 → div 로 감쌀 필요 없음.
+// 명시적으로 지정하고 싶으면 <div class="toc"> 로 감싸도 동작한다.
+$toc-auto: ':root:root:root article .markdown-preview-view > ul:first-of-type:has(> li > a[href^="#"])';
+
+// 목차 박스
+:root:root:root article .toc,
+#{$toc-auto} {
+  margin: 1.25rem 0 2rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--lightgray);
+  font-size: 0.82rem;
+  line-height: 1.95;
+  list-style: none;
+}
+// 내부 목록(중첩 포함): 불릿 제거
+:root:root:root article .toc ul,
+#{$toc-auto} ul {
+  margin: 0;
+  padding-left: 1rem;
+  list-style: none;
+}
+// div 로 감쌌을 때의 최상위 목록은 들여쓰기 없이
+:root:root:root article .toc > ul {
+  padding-left: 0;
+}
+:root:root:root article .toc li,
+#{$toc-auto} li {
+  margin: 0;
+}
+// 색은 토큰 대신 리터럴로. things 테마가 --darkgray 등을 재정의해서 예상과 다르게 풀림.
+:root:root:root article .toc a,
+#{$toc-auto} a {
+  background: none !important;
+  color: #9a9a9a;
+  text-decoration: underline;
+  text-decoration-color: #dcdcdc;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition:
+    color 0.15s ease,
+    text-decoration-color 0.15s ease;
+}
+:root:root:root article .toc a:hover,
+#{$toc-auto} a:hover {
+  color: #454545;
+  text-decoration-color: #7a7a7a;
+}
+// 목차 안 코드 조각: 배경 없이 글꼴만 유지하고 색은 링크를 따라간다
+:root:root:root article .toc code,
+#{$toc-auto} code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.95em;
+}
+:root:root:root[saved-theme="dark"] article .toc a,
+:root:root:root[saved-theme="dark"] article .markdown-preview-view > ul:first-of-type:has(> li > a[href^="#"]) a {
+  color: #7d7d7d;
+  text-decoration-color: #4a4a4a;
+}
+:root:root:root[saved-theme="dark"] article .toc a:hover,
+:root:root:root[saved-theme="dark"] article .markdown-preview-view > ul:first-of-type:has(> li > a[href^="#"]) a:hover {
+  color: #b9b9b9;
+  text-decoration-color: #7d7d7d;
+}
+
 :root:root:root article h3,
 :root:root:root .graph h3 {
   font-size: 1.05rem;
