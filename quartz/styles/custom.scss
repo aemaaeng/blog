@@ -96,8 +96,29 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   color: var(--secondary);
 }
 
-:root:root:root .search {
-  margin-bottom: 6px;
+// ── 헤더 1줄 정렬: 사이트 제목 좌측, 검색/다크모드 아이콘 우측 ──
+// .popover-hint 안에는 글 상세의 breadcrumb·제목·메타도 함께 들어오므로,
+// flex 대신 grid로 첫 줄에만 제목+툴바를 배치하고 나머지는 전체 폭을 쓰게 둔다.
+:root:root:root .page-header > .popover-hint {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 1rem;
+  align-items: center;
+}
+:root:root:root .page-header > .popover-hint > * {
+  grid-column: 1 / -1;
+}
+:root:root:root .page-header > .popover-hint > .page-title {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+}
+// 아이콘 사이 간격은 quartz.config.yaml의 layout.groups.toolbar.gap(0.5rem)이
+// 인라인 style로 붙으므로 여기서 gap을 지정해도 덮이지 않는다. 바꾸려면 config에서.
+:root:root:root .page-header > .popover-hint > .flex-component {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
 }
 // 사이트 헤더와 본문(글 제목)을 구분선으로 분리
 :root:root:root .article-title {
@@ -214,35 +235,72 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   color: hsl(185, 55%, 68%) !important;
 }
 
-// ── 다크모드 토글 버튼: 클릭 가능한 커서 ──
-:root:root:root .darkmode {
-  cursor: pointer;
-}
-
-// ── 검색바: 투박한 박스 → 가볍고 부드럽게 ──
+// ── 헤더 아이콘 버튼(검색 · 다크모드) ──
+// 36px는 탭 타깃 권장 최소치. 아이콘 자체는 17~18px.
 :root:root:root .search-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
   background: transparent;
-  border: 1px solid var(--lightgray);
-  border-radius: 999px;
-  padding: 5px 14px;
-  min-width: 0;
-  width: fit-content;
-  gap: 7px;
-  color: var(--gray);
-  font-size: 0.85rem;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 :root:root:root .search-button:hover {
-  border-color: var(--gray);
-  color: var(--dark);
+  background: var(--lightgray);
 }
+:root:root:root .search-button:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+// 버튼에 aria-label="검색"이 있어 라벨을 숨겨도 스크린리더에는 읽힌다
 :root:root:root .search-button p {
-  margin: 0;
-  display: inline;
+  display: none;
 }
 :root:root:root .search-button svg {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+:root:root:root .search-button svg .search-path {
+  stroke: var(--darkgray);
+}
+
+// 다크모드 버튼은 things 테마가 내부 svg를 숨기고 버튼 자체를 mask-image로 칠한다.
+// 따라서 background를 건드리면 아이콘이 사라진다 — 크기와 마스크 정렬만 조정한다.
+:root:root:root button.darkmode {
+  // things 테마가 body .darkmode에 --cursor(=default)를 걸어 플러그인의 pointer를 덮는다
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  mask-size: 18px 18px;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 18px 18px;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+}
+
+// hover/focus 배경은 버튼 자신(=아이콘 페인트) 대신 감싸는 래퍼에 준다
+:root:root:root .flex-component > div:has(> button.darkmode) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+:root:root:root .flex-component > div:has(> button.darkmode):hover {
+  background: var(--lightgray);
+}
+:root:root:root .flex-component > div:has(> button.darkmode:focus-visible) {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
 }
 
 // ── 라이트모드 텍스트 선택(드래그) 색: 더 연하게 (글자는 진하게 → 대비 유지) ──
