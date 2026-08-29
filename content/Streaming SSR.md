@@ -1,5 +1,6 @@
 ---
 title: Streaming SSR
+description: 일반 SSR과의 차이, SEO 영향, 적용 시 주의할 점을 정리합니다.
 date: 2026-07-21
 tags:
   - frontend

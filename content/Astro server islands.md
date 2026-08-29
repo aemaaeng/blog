@@ -1,5 +1,6 @@
 ---
 title: Astro server islands
+description: 왜 만들어졌고 어떤 점이 Streaming SSR과 다른지 살펴봅니다.
 date: 2026-07-21
 tags:
   - frontend
