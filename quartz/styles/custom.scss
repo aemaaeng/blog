@@ -77,11 +77,13 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
   margin-top: 1.25rem;
 }
 
-// 상단 마스트헤드: 사이트 제목(크게) + 검색줄
+// 상단 마스트헤드: 사이트 제목 = 위계(사이트 제목 > 글 제목 > 섹션 라벨/날짜)의 1단.
+// 모바일 크기는 파일 끝 media query에서 따로 줄인다.
 :root:root:root .page-title {
-  font-size: 1.3rem;
+  font-size: 1.7rem;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 4px 0 14px;
+  line-height: 1.25;
 }
 // 사이트 제목(내 이름) = 홈으로 가는 링크. 클릭 가능함이 드러나게.
 :root:root:root .page-title a {
@@ -263,9 +265,6 @@ $kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
 }
 
 // ── 헤딩 두께 + 크기 전체적으로 낮추기(Pretendard 가변) ──
-:root:root:root .page-title {
-  font-weight: 640;
-}
 :root:root:root .article-title {
   font-size: 1.4rem;
   font-weight: 640;
@@ -377,18 +376,55 @@ $toc-auto: ':root:root:root article .markdown-preview-view > ul:first-of-type:ha
   font-size: 0.95rem;
   font-weight: 600;
 }
-// 홈 글 목록의 제목들(afterBody라 article 스코프 밖 → 별도 지정)
+// ── 홈 위계: 사이트 제목 > 글 제목 > 섹션 라벨/날짜 ──
+// (글 목록은 afterBody라 article 스코프 밖 → 별도 지정)
+
 :root:root:root .recent-notes > h3 {
-  font-size: 1rem;
+  font-size: 0.78rem;
   font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--gray);
+  margin-bottom: 0.75rem;
 }
+
 :root:root:root .recent-notes .recent-li h3 {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 600;
+  line-height: 1.35;
+  margin: 0 0 0.35rem;
 }
-// 목록 항목의 날짜(meta)도 작게
+
+// 한 줄 설명 (Head.tsx에서 빌드타임 description을 주입)
+:root:root:root .recent-notes .recent-li .recent-desc {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #6f6f6f; // --darkgray는 본문색과 같아 제목과 붙어 보인다 → 한 단계 연하게
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+:root:root:root[saved-theme="dark"] .recent-notes .recent-li .recent-desc {
+  color: #a3a3a6;
+}
+
+// 플러그인이 .section > .meta에 opacity: 0.6을 걸어둬 색을 지정해도 흐려지고
+// 대비가 4.5:1 아래로 떨어진다 → opacity를 되돌리고 색으로만 위계를 만든다
 :root:root:root .recent-notes .recent-li .meta {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #696e74;
+  opacity: 1;
+  margin: 0;
+}
+:root:root:root[saved-theme="dark"] .recent-notes .recent-li .meta {
+  color: #8f959c;
+}
+
+:root:root:root .recent-notes .recent-li {
+  margin-bottom: 1.6rem;
 }
 
 // ── 태그 페이지 목록(.section): 3단 그리드 → 심플 좌측 정렬 + 크기 축소 ──

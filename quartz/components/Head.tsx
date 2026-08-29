@@ -1,5 +1,5 @@
 import { i18n } from "../i18n"
-import { FullSlug, getFileExtension, joinSegments, pathToRoot } from "../util/path"
+import { FullSlug, getFileExtension, isFolderPath, joinSegments, pathToRoot } from "../util/path"
 import { CSSResourceToStyleElement, JSResourceToScriptElement } from "../util/resources"
 import { googleFontHref, googleFontSubsetHref } from "../util/theme"
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
@@ -11,6 +11,7 @@ export default (() => {
     fileData,
     externalResources,
     ctx,
+    allFiles,
   }: QuartzComponentProps) => {
     const titleSuffix = cfg.pageTitleSuffix ?? ""
     const title =
@@ -35,6 +36,29 @@ export default (() => {
       (e) => e.name === CustomOgImagesEmitterName,
     )
     const ogImageDefaultPath = `https://${cfg.baseUrl}/static/og-image.png`
+
+    // 홈 글 목록(recent-notes)에 한 줄 설명을 붙이기 위한 slug → description 맵.
+    // recent-notes 플러그인은 .quartz/(빌드마다 재설치)에 있어 직접 수정할 수 없으므로,
+    // 빌드타임에 만든 맵을 인라인으로 심고 아래 스크립트에서 DOM에 주입한다.
+    // unlisted 페이지와 폴더 페이지(홈 index 포함)는 목록에 뜨지 않으므로 설명도 내보내지 않는다.
+    // allFiles에는 그대로 남아 있어 RecentNotes(filterListedPages · hideFolderPages)와
+    // 같은 기준으로 걸러야 한다.
+    // 암호화 페이지는 본문과 data.description만 비워지고 frontmatter.description은 남으므로
+    // (unlistWhenEncrypted: false면 목록에도 남는다) 여기서 따로 제외해야 요약이 새지 않는다.
+    const recentDescriptions = Object.fromEntries(
+      (allFiles ?? [])
+        .filter(
+          (f) =>
+            f.slug &&
+            f.unlisted !== true &&
+            f.encrypted !== true &&
+            !isFolderPath(f.slug) &&
+            typeof f.frontmatter?.description === "string",
+        )
+        .map((f) => [f.slug as string, (f.frontmatter!.description as string).trim()])
+        .filter(([, d]) => d.length > 0),
+    )
+    const recentDescriptionsJson = JSON.stringify(recentDescriptions).replace(/</g, "\\u003c")
 
     const coreStylesheet = css[0]?.content
     const coreScript = js.find(
@@ -109,6 +133,11 @@ export default (() => {
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){var KEY="graph-collapsed",TITLE="Graph";function decorate(){document.querySelectorAll(".graph h3").forEach(function(title){if(title.dataset.gtBound==="true")return;var graph=title.closest(".graph");if(!graph)return;title.dataset.gtBound="true";title.textContent="";var caret=document.createElement("span");caret.className="graph-caret";var label=document.createElement("span");label.textContent=TITLE;title.append(caret,label);var collapsed=localStorage.getItem(KEY)==="true";graph.classList.add("no-anim");graph.classList.toggle("is-collapsed",collapsed);caret.textContent=collapsed?"\\u25B8":"\\u25BE";requestAnimationFrame(function(){graph.classList.remove("no-anim");});});}document.addEventListener("click",function(e){var t=e.target;if(!t||!t.closest)return;var title=t.closest(".graph h3");if(!title)return;var graph=title.closest(".graph");if(!graph)return;var collapsed=!graph.classList.contains("is-collapsed");graph.classList.toggle("is-collapsed",collapsed);var caret=title.querySelector(".graph-caret");if(caret)caret.textContent=collapsed?"\\u25B8":"\\u25BE";localStorage.setItem(KEY,String(collapsed));});function run(){decorate();setTimeout(decorate,150);setTimeout(decorate,400);var dm=document.querySelector("button.darkmode");if(dm)dm.setAttribute("title","라이트/다크 모드 전환");}document.addEventListener("DOMContentLoaded",run);document.addEventListener("nav",run);})();`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var D=${recentDescriptionsJson};function slugOf(a){var h=a.getAttribute("href")||"";try{h=decodeURIComponent(h);}catch(e){}return h.replace(/^(?:\\.\\.?\\/)+/,"").replace(/^\\//,"").replace(/\\/$/,"").replace(/#.*$/,"");}function decorate(){document.querySelectorAll(".recent-notes .recent-li").forEach(function(li){if(li.dataset.descBound==="true")return;var a=li.querySelector(".desc h3 a");if(!a)return;li.dataset.descBound="true";var k=slugOf(a);if(!Object.prototype.hasOwnProperty.call(D,k))return;var d=D[k];if(!d)return;var h3=a.closest("h3");if(!h3)return;var p=document.createElement("p");p.className="recent-desc";p.textContent=d;h3.insertAdjacentElement("afterend",p);});}function run(){decorate();setTimeout(decorate,150);setTimeout(decorate,400);}document.addEventListener("DOMContentLoaded",run);document.addEventListener("nav",run);})();`,
           }}
         />
       </head>
