@@ -101,6 +101,9 @@ plugins:
   - source: github:quartz-community/hard-line-breaks
     enabled: true
     order: 90
+  - source: ./plugins/date-badge
+    enabled: true
+    order: 95
   - source: github:quartz-community/ox-hugo
     enabled: false
     order: 91

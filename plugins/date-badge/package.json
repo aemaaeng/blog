@@ -1,0 +1,13 @@
+{
+  "name": "date-badge",
+  "version": "1.0.0",
+  "description": "본문의 @YYYY-MM-DD 를 '추가' 날짜 뱃지로 바꾸는 transformer",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js"
+}

@@ -675,3 +675,23 @@ body[data-slug="tags/index"] .page-listing ul.section-ul {
     padding-top: 18px;
   }
 }
+
+// ── 본문 @YYYY-MM-DD → "추가" 날짜 뱃지 (plugins/date-badge) ──
+.date-badge {
+  display: inline-block;
+  margin-left: 0.3em;
+  padding: 0.05em 0.55em;
+  border-radius: 999px;
+  font-size: 0.72em;
+  font-weight: 500;
+  line-height: 1.6;
+  vertical-align: 0.12em;
+  white-space: nowrap;
+  color: #2f7a4f;
+  background: #e5f2e9;
+}
+
+:root:root:root[saved-theme="dark"] .date-badge {
+  color: #8fd3a8;
+  background: rgba(80, 180, 120, 0.16);
+}
