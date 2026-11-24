@@ -3,7 +3,7 @@
 A personal knowledge base built with Quartz.  
 Notes for my future self.
 
-🔗 **https://hyemin-jardin.pages.dev**
+🔗 **https://hyemin.dev**
 
 ## Built with
 
