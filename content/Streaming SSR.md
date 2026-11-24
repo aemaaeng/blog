@@ -4,6 +4,8 @@ description: 일반 SSR과의 차이, SEO 영향, 적용 시 주의할 점을 �
 date: 2026-07-21
 tags:
   - frontend
+  - Next.js
+  - Astro
 ---
 
 https://nextjs.org/docs/app/guides/streaming

@@ -4,6 +4,7 @@ description: 왜 만들어졌고 어떤 점이 Streaming SSR과 다른지 살펴
 date: 2026-07-21
 tags:
   - frontend
+  - Astro
 ---
 
 - [[Streaming SSR]]과는 무엇이 다른지?
