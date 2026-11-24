@@ -621,6 +621,33 @@ $toc-auto: ':root:root:root article .markdown-preview-view > ul:first-of-type:ha
 :root:root:root article blockquote.callout .callout-content {
   font-size: 0.95em;
 }
+// 제목 위 여백: 테마 기본(h2 28px · h3 16px)은 문단 간격(15px)과 비슷해 앞 섹션 끝과 새 섹션이 잘 구분되지 않음.
+// 위쪽만 넓혀 제목이 아래 본문에 붙어 보이게 함. 아래쪽 여백은 테마 그대로.
+:root:root:root article h2 {
+  margin-top: 3rem;
+}
+:root:root:root article h3 {
+  margin-top: 2.25rem;
+}
+:root:root:root article :is(h4, h5, h6) {
+  margin-top: 1.75rem;
+}
+// 제목 바로 뒤에 하위 제목이 오면(h2 → h3) 둘은 한 묶음이라 원래 간격(16px)으로 되돌림
+:root:root:root article :is(h2, h3, h4) + :is(h3, h4, h5, h6) {
+  margin-top: 1rem;
+}
+
+// things 테마가 본문 이미지에 box-shadow 를 줌 → 흰 배경 다이어그램·캡처가 카드처럼 떠 보여서 제거
+:root:root:root article img {
+  box-shadow: none;
+}
+
+// things 테마가 굵게·기울임·취소선·하이라이트 텍스트에 cursor: grab 을 줘서 손바닥 커서가 뜸 → 부모 커서를 따르게
+// (inherit 이라 링크 안의 굵은 글씨는 그대로 pointer)
+:root:root:root article :is(b, strong, em, i, del, .text-highlight) {
+  cursor: inherit;
+}
+
 // 제목 hover 시 뜨는 링크(앵커) 아이콘: things 테마가 a.internal-link 전체에 노란 하이라이트 배경을 줘서
 // 앵커 아이콘에도 노란 박스가 생김 → 앵커만 배경 제거
 :root:root:root article a[role="anchor"] {
