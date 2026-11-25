@@ -116,7 +116,9 @@ async function _navigate(url: URL, isBack: boolean = false) {
       const el = document.getElementById(decodeURIComponent(url.hash.substring(1)))
       el?.scrollIntoView()
     } else {
-      window.scrollTo({ top: 0 })
+      // 테마의 html { scroll-behavior: smooth } 때문에 긴 글 끝에서 이동하면
+      // 부드러운 스크롤이 head 교체 중에 끊겨 중간(예: 96px)에서 멈춤 → 페이지 이동은 즉시 이동
+      window.scrollTo({ top: 0, behavior: "instant" })
     }
   }
 
