@@ -7,6 +7,8 @@ Quartz v5 기반 개인 블로그. 글은 Obsidian으로 `content/`에 쓰고, `
 - 로컬 확인: `npm run dev` → http://localhost:8080
 - 설정: `quartz.config.yaml` · 커스텀 스타일: `quartz/styles/custom.scss`
 
+답변은 한국어로 한다.
+
 ## 규칙
 
 | 작업                                      | 문서                                                     |
@@ -15,4 +17,5 @@ Quartz v5 기반 개인 블로그. 글은 Obsidian으로 `content/`에 쓰고, `
 | 이미지·파일 업로드 (R2)                   | [.claude/rules/images.md](.claude/rules/images.md)       |
 | 이전 블로그(티스토리) 글 이관             | [.claude/rules/migration.md](.claude/rules/migration.md) |
 | 스타일 수정 (테마 덮어쓰기)               | [.claude/rules/styling.md](.claude/rules/styling.md)     |
+| 플러그인 동작 변경                        | [.claude/rules/plugins.md](.claude/rules/plugins.md)     |
 | 커밋                                      | [.claude/rules/git.md](.claude/rules/git.md)             |

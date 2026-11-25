@@ -26,8 +26,20 @@ paths:
 - 굵게·기울임 등에 붙은 `cursor: grab` 제거
 - 본문 이미지 `box-shadow` 제거
 - 인용문은 핑크 왼쪽 선, callout은 타입 색의 둥근 박스 (info는 파랑)
+- 글 제목↔태그 간격: 숨겨진 속성 표(`.note-properties-table`)의 margin-top 제거, 제목 아래 10px
+- 검색 모달: 테마가 `.search-space` 하위 배경을 전부 transparent로 덮어씀 → 불투명 카드. 결과 카드 여백·제목 크기, 미리보기에서 사이트 머리글·breadcrumb 숨김, 홈(index) 결과 숨김
+- 코드 블록: `pre`·`code` 이중 패딩과 줄(`[data-line]`)별 배경 제거, 줄번호는 6줄 이상 블록만(작고 흐리게), 우상단 언어 라벨
+- 글 상세 하단 목록(`body:not([data-slug='index'])`): 64px 여백 + 1px 구분선, 제목 16px·요약 1줄, 최근 5개, `현재 글` 뱃지(`.is-current`). 홈 목록은 별도 스타일
+- 모바일(≤800px): 상단 여백 24px, breadcrumb 한 줄 말줄임, 목록 제목 축소
+
+## 유지하기로 한 결정
+
+- 본문 `word-break`는 `normal` 그대로. `keep-all`로 바꾸면 모바일에서 오른쪽 여백이 크게 남아 일부러 되돌린 것이다.
+- 글 하단 목록 라벨은 "글 목록" 유지 (현재 글도 목록에 남기 때문에 "다른 글"은 맞지 않음).
+- 본문 링크 hover 팝오버는 끔(`enablePopovers: false`). 검색 결과 미리보기는 켬.
 
 ## 확인
 
 - `npm run dev` 후 브라우저에서 실제로 본다. 가능하면 computed style 값으로 확인한다.
-- 라이트/다크 둘 다 확인한다.
+- PC, 모바일(390px), 다크모드 세 가지를 확인한다.
+- CSS는 새로고침으로 반영되지만, `quartz.config.yaml`을 바꾸면 개발 서버를 재시작해야 한다.
