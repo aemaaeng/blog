@@ -28,8 +28,14 @@
 }
 
 // ── 한글 폰트를 Pretendard로 ──
-$kr: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
-  "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+$kr:
+  "Pretendard Variable",
+  "Pretendard",
+  -apple-system,
+  BlinkMacSystemFont,
+  "Apple SD Gothic Neo",
+  "Segoe UI",
+  sans-serif;
 
 :root:root:root {
   --font-text: #{$kr};
@@ -418,12 +424,20 @@ $toc-auto: ':root:root:root article .markdown-preview-view > ul:first-of-type:ha
   font-size: 0.95em;
 }
 :root:root:root[saved-theme="dark"] article .toc a,
-:root:root:root[saved-theme="dark"] article .markdown-preview-view > ul:first-of-type:has(> li > a[href^="#"]) a {
+:root:root:root[saved-theme="dark"]
+  article
+  .markdown-preview-view
+  > ul:first-of-type:has(> li > a[href^="#"])
+  a {
   color: #7d7d7d;
   text-decoration-color: #4a4a4a;
 }
 :root:root:root[saved-theme="dark"] article .toc a:hover,
-:root:root:root[saved-theme="dark"] article .markdown-preview-view > ul:first-of-type:has(> li > a[href^="#"]) a:hover {
+:root:root:root[saved-theme="dark"]
+  article
+  .markdown-preview-view
+  > ul:first-of-type:has(> li > a[href^="#"])
+  a:hover {
   color: #b9b9b9;
   text-decoration-color: #7d7d7d;
 }
@@ -765,4 +779,100 @@ body[data-slug="tags/index"] .page-listing ul.section-ul {
 :root:root:root[saved-theme="dark"] .date-badge {
   color: #8fd3a8;
   background: rgba(80, 180, 120, 0.16);
+}
+
+// ── 검색 모달 ──
+// things 테마가 .search-space 하위 배경을 전부 transparent로, 결과 카드 여백을 0으로,
+// 결과 제목을 본문 h3 크기로 덮어써서 엉성해 보임 → 카드형 모달로 정리
+$search-layout: ":root:root:root body .search > .search-container > .search-space > .search-layout";
+
+:root:root:root body .search > .search-container > .search-space > input {
+  border-radius: 10px;
+  padding: 0.7em 1em;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  background: var(--light);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+#{$search-layout} {
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+#{$search-layout} > :is(.results-container, .preview-container) {
+  background: var(--light);
+}
+
+// 결과 목록
+#{$search-layout} > .results-container {
+  padding: 0.5rem;
+}
+
+#{$search-layout} > .results-container .result-card {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0.65rem 0.8rem;
+  border: none;
+  border-radius: 8px;
+}
+
+#{$search-layout} > .results-container .result-card:is(:hover, :focus, .focus) {
+  // --highlight는 노란색이라 검색어 하이라이트와 겹침 → 중립 회색
+  background: color-mix(in srgb, var(--dark) 6%, transparent);
+}
+
+#{$search-layout} > .results-container .result-card .card-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--dark);
+}
+
+// 모바일(미리보기 없음)에서만 보이는 요약: 두 줄로 자르고 흐리게
+@media all and (max-width: 800px) {
+  #{$search-layout} > .results-container .result-card .card-description {
+    display: -webkit-box;
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--gray);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// 미리보기: 본문만 보이게 사이트 머리글(이름·검색·다크모드·breadcrumb) 숨김
+#{$search-layout} > .preview-container {
+  padding: 1.5rem 2rem;
+}
+
+#{$search-layout} > .preview-container :is(.page-title, .flex-component, .breadcrumb-container) {
+  display: none;
+}
+
+#{$search-layout} > .preview-container .article-title {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+// 홈(index)은 소개 문구만 있어서 결과에 나와도 의미 없음
+#{$search-layout} > .results-container .result-card[id="index"] {
+  display: none;
+}
+
+:root:root:root[saved-theme="dark"] body .search > .search-container > .search-space > input,
+:root:root:root[saved-theme="dark"]
+  body
+  .search
+  > .search-container
+  > .search-space
+  > .search-layout {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
 }

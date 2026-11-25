@@ -3,7 +3,7 @@ configuration:
   pageTitle: Hyemin Kim
   pageTitleSuffix: ""
   enableSPA: true
-  enablePopovers: true
+  enablePopovers: false
   locale: ko-KR
   baseUrl: hyemin.dev
   ignorePatterns:
