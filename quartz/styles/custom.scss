@@ -1140,3 +1140,34 @@ $post-page: ":root:root:root body:not([data-slug='index'])";
 :root:root:root .page-header .breadcrumb-element:last-child a {
   color: var(--darkgray);
 }
+
+// ── 모바일 푸터 "맨 위로" 버튼 (Head.tsx에서 footer에 주입) ──
+// 긴 글 끝에서 위로 돌아갈 수단. PC는 헤더가 가까워 필요 없어 숨김.
+:root:root:root footer {
+  position: relative;
+}
+:root:root:root footer .to-top {
+  display: none;
+}
+@media all and (max-width: 800px) {
+  :root:root:root footer .to-top {
+    position: absolute;
+    right: 24px; // footer가 화면 전체 폭에 좌우 padding 24px이라 본문 오른쪽 끝에 맞춤
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--divider);
+    border-radius: 999px;
+    background: var(--light);
+    color: var(--darkgray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  :root:root:root footer .to-top:active {
+    background: var(--lightgray);
+  }
+}
