@@ -36,23 +36,24 @@
     var d = new Date()
     return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
   }
+  // 저장 형식: { date, tracks(그날 받은 20곡), deck, pos }
+  // /api/song은 요청마다 다른 20곡을 주므로, 그날은 처음 받은 묶음을 그대로 이어 쓴다.
   function save() {
     try {
       localStorage.setItem(
         KEY,
-        JSON.stringify({ date: today(), n: tracks.length, deck: deck, pos: pos }),
+        JSON.stringify({ date: today(), tracks: tracks, deck: deck, pos: pos }),
       )
     } catch (e) {}
   }
-  function restore() {
+  function stored() {
     try {
       var s = JSON.parse(localStorage.getItem(KEY) || "null")
-      if (s && s.date === today() && s.n === tracks.length) {
-        deck = s.deck
-        pos = s.pos
-        return
-      }
+      if (s && s.date === today() && s.tracks && s.tracks.length) return s
     } catch (e) {}
+    return null
+  }
+  function fresh() {
     deck = tracks.map(function (_, i) {
       return i
     })
@@ -68,6 +69,14 @@
 
   function load() {
     if (loading) return loading
+    var s = stored()
+    if (s) {
+      tracks = s.tracks
+      deck = s.deck
+      pos = s.pos
+      loading = Promise.resolve(tracks)
+      return loading
+    }
     loading = fetch("/api/song")
       .then(function (r) {
         if (!r.ok) throw new Error(String(r.status))
@@ -81,7 +90,7 @@
         tracks = DEV ? MOCK : null
       })
       .then(function () {
-        if (tracks) restore()
+        if (tracks) fresh()
         return tracks
       })
     return loading
