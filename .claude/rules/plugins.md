@@ -12,6 +12,8 @@ paths:
 - `.quartz/plugins/`는 `quartz.config.yaml`의 `github:quartz-community/*` 소스를 빌드마다 설치하는 곳이고 `.gitignore`에 들어 있다.
 - 여기를 고치면 로컬에서는 바뀌어 보여도 **배포에 반영되지 않는다**. 코드를 읽어 원인을 찾는 용도로만 쓴다.
 
+- 반면 `quartz/`(코어: `quartz/components/`, `quartz/components/scripts/spa.inline.ts` 등)는 레포에 있어 고치면 배포된다. 예: SPA 이동 시 스크롤을 즉시 맨 위로(`behavior: "instant"`).
+
 ## 바꾸는 방법 (위에서부터 시도)
 
 1. **설정 옵션**: 플러그인 `src/components/*.tsx`의 Options나 README를 먼저 본다.
