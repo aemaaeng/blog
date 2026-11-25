@@ -1017,6 +1017,20 @@ $post-page: ":root:root:root body:not([data-slug='index'])";
   }
 }
 
+// 지금 읽고 있는 글: 목록에서 빼지 않고 "현재 글" 뱃지로 표시 (Head.tsx 스크립트가 .is-current 부여)
+#{$post-page} .recent-notes .recent-li.is-current h3 a::after {
+  content: "현재 글";
+  display: inline-block;
+  margin-left: 0.5em;
+  padding: 0.05em 0.5em;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  vertical-align: 0.15em;
+  color: var(--gray);
+  background: color-mix(in srgb, var(--dark) 6%, transparent);
+}
+
 // 글 하단에서는 최근 5개만 (홈은 전체)
 #{$post-page} .recent-notes .recent-li:nth-child(n + 6) {
   display: none;

@@ -38,6 +38,7 @@ export default (() => {
     const ogImageDefaultPath = `https://${cfg.baseUrl}/static/og-image.png`
 
     // 홈 글 목록(recent-notes)에 한 줄 설명을 붙이기 위한 slug → description 맵.
+    // 같은 스크립트에서 지금 보고 있는 글의 항목에 .is-current를 붙인다(글 하단 목록에서 "현재 글" 표시).
     // recent-notes 플러그인은 .quartz/(빌드마다 재설치)에 있어 직접 수정할 수 없으므로,
     // 빌드타임에 만든 맵을 인라인으로 심고 아래 스크립트에서 DOM에 주입한다.
     // unlisted 페이지와 폴더 페이지(홈 index 포함)는 목록에 뜨지 않으므로 설명도 내보내지 않는다.
@@ -137,7 +138,7 @@ export default (() => {
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var D=${recentDescriptionsJson};function slugOf(a){var h=a.getAttribute("href")||"";try{h=decodeURIComponent(h);}catch(e){}return h.replace(/^(?:\\.\\.?\\/)+/,"").replace(/^\\//,"").replace(/\\/$/,"").replace(/#.*$/,"");}function decorate(){document.querySelectorAll(".recent-notes .recent-li").forEach(function(li){if(li.dataset.descBound==="true")return;var a=li.querySelector(".desc h3 a");if(!a)return;li.dataset.descBound="true";var k=slugOf(a);if(!Object.prototype.hasOwnProperty.call(D,k))return;var d=D[k];if(!d)return;var h3=a.closest("h3");if(!h3)return;var p=document.createElement("p");p.className="recent-desc";p.textContent=d;h3.insertAdjacentElement("afterend",p);});}function run(){decorate();setTimeout(decorate,150);setTimeout(decorate,400);}document.addEventListener("DOMContentLoaded",run);document.addEventListener("nav",run);})();`,
+            __html: `(function(){var D=${recentDescriptionsJson};function slugOf(a){var h=a.getAttribute("href")||"";try{h=decodeURIComponent(h);}catch(e){}return h.replace(/^(?:\\.\\.?\\/)+/,"").replace(/^\\//,"").replace(/\\/$/,"").replace(/#.*$/,"");}function decorate(){var cur=document.body.dataset.slug||"";document.querySelectorAll(".recent-notes .recent-li").forEach(function(li){var a0=li.querySelector(".desc h3 a");if(a0)li.classList.toggle("is-current",slugOf(a0)===cur);if(li.dataset.descBound==="true")return;var a=li.querySelector(".desc h3 a");if(!a)return;li.dataset.descBound="true";var k=slugOf(a);if(!Object.prototype.hasOwnProperty.call(D,k))return;var d=D[k];if(!d)return;var h3=a.closest("h3");if(!h3)return;var p=document.createElement("p");p.className="recent-desc";p.textContent=d;h3.insertAdjacentElement("afterend",p);});}function run(){decorate();setTimeout(decorate,150);setTimeout(decorate,400);}document.addEventListener("DOMContentLoaded",run);document.addEventListener("nav",run);})();`,
           }}
         />
       </head>
