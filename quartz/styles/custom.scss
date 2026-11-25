@@ -978,3 +978,46 @@ $code-figure: ":root:root:root article figure[data-rehype-pretty-code-figure]";
 #{$code-figure} > pre:is([data-language="plaintext"], [data-language="text"])::before {
   content: none;
 }
+
+// ── 글 상세 하단 글 목록: 본문과 구분 ──
+// 홈과 같은 목록 스타일(제목 1.25rem)이 글 하단에도 그대로 쓰여,
+// 본문 h3(1.05rem)보다 목록 제목이 더 커서 글이 끝나지 않고 이어지는 것처럼 보였음.
+// → 구분선 위아래 여백을 넉넉히, 목록은 한 단계 작고 촘촘하게. 홈(index)은 그대로.
+$post-page: ":root:root:root body:not([data-slug='index'])";
+
+#{$post-page} .center > hr {
+  margin: 4rem 0 2.5rem;
+  height: 1px;
+  border: none;
+  background: var(--lightgray);
+}
+
+#{$post-page} .recent-notes > h3 {
+  margin-bottom: 1rem;
+}
+
+#{$post-page} .recent-notes .recent-li {
+  margin-bottom: 1.1rem;
+}
+
+#{$post-page} .recent-notes .recent-li h3 {
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+#{$post-page} .recent-notes .recent-li .recent-desc {
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+  -webkit-line-clamp: 1;
+}
+
+@media all and (max-width: 800px) {
+  #{$post-page} .recent-notes .recent-li h3 {
+    font-size: 1rem;
+  }
+}
+
+// 글 하단에서는 최근 5개만 (홈은 전체)
+#{$post-page} .recent-notes .recent-li:nth-child(n + 6) {
+  display: none;
+}
