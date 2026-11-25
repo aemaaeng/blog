@@ -1026,6 +1026,12 @@ $code-figure: ":root:root:root article figure[data-rehype-pretty-code-figure]";
 #{$code-figure} > pre:is([data-language="plaintext"], [data-language="text"])::before {
   content: none;
 }
+// 모바일은 코드 첫 줄이 블록 폭을 다 써서 우상단 라벨이 코드 위에 겹침 → 라벨 숨김
+@media all and (max-width: 800px) {
+  #{$code-figure} > pre[data-language]::before {
+    content: none;
+  }
+}
 
 // ── 글 상세 하단 글 목록: 본문과 구분 ──
 // 홈과 같은 목록 스타일(제목 1.25rem)이 글 하단에도 그대로 쓰여,
