@@ -136,6 +136,15 @@ $kr:
   border-top: 1px solid var(--lightgray);
 }
 
+// 글 제목 ↔ 태그 간격: 숨겨진 속성 summary 아래 표(.note-properties-table)에 margin-top 16px가 남아
+// 제목 아래 마진과 합쳐 38px나 벌어졌음 → jbee.io처럼 제목에 메타가 붙어 보이게 10px 안팎으로
+:root:root:root .article-title {
+  margin-bottom: 10px;
+}
+:root:root:root .note-properties .note-properties-table {
+  margin-top: 0;
+}
+
 // 글 상세의 날짜/읽기시간(content-meta) 작게
 :root:root:root .content-meta {
   font-size: 0.85rem;
@@ -749,16 +758,39 @@ body[data-slug="tags/index"] .page-listing ul.section-ul {
     font-weight: inherit;
   }
   :root:root:root .page-header {
-    margin-top: 40px;
+    margin-top: 24px;
   }
+  // 긴 글 제목이 breadcrumb에서 두 줄로 접혀 바로 아래 글 제목과 중복돼 보임 → 한 줄 말줄임
   :root:root:root .breadcrumb-container {
     font-size: 0.8rem;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+  :root:root:root .breadcrumb-element:last-child {
+    min-width: 0;
+    overflow: hidden;
+  }
+  :root:root:root .breadcrumb-element:last-child > * {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  // 글 목록 제목이 좁은 화면에서 본문 h2만큼 커서 목록이 길어짐
+  :root:root:root .recent-notes .recent-li h3 {
+    font-size: 1.1rem;
   }
   // 마스트헤드↔본문 구분선 여백 축소
   :root:root:root .article-title {
     margin-top: 20px;
     padding-top: 18px;
   }
+}
+
+// 문단 끝에 한두 글자("다.")만 남는 줄 줄이기. word-break는 그대로 두고 줄 배분만 조정
+// (지원 안 하는 브라우저는 무시)
+:root:root:root article :is(p, li) {
+  text-wrap: pretty;
 }
 
 // ── 본문 @YYYY-MM-DD → "추가" 날짜 뱃지 (plugins/date-badge) ──
