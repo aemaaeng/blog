@@ -908,3 +908,73 @@ $search-layout: ":root:root:root body .search > .search-container > .search-spac
   > .search-layout {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
 }
+
+// ── 코드 블록 ──
+// pre와 code가 각각 padding 12px 16px를 가져 여백이 이중(위 ~50px)으로 잡히고,
+// 줄간격 1.88·모든 블록 줄번호 때문에 짧은 코드도 부피가 큼 → 한 겹 여백, 촘촘한 줄간격.
+$code-figure: ":root:root:root article figure[data-rehype-pretty-code-figure]";
+
+#{$code-figure} {
+  position: relative;
+  margin: 1.25rem 0;
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--dark) 4%, var(--light));
+}
+
+#{$code-figure} > pre {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+#{$code-figure} > pre > code {
+  padding: 1rem 1.25rem;
+  font-size: 0.85rem;
+  line-height: 1.65;
+}
+
+// 테마가 각 줄([data-line])에도 배경을 칠해 블록 안에 박스가 하나 더 보임
+#{$code-figure} > pre > code > [data-line] {
+  background: transparent;
+}
+
+// 줄번호는 6줄 이상일 때만 (짧은 코드에선 잡음)
+#{$code-figure} > pre > code:not(:has(> [data-line]:nth-child(6))) > [data-line]::before {
+  display: none;
+}
+
+// 줄번호가 있을 때: 번호 칸(16px)+간격(16px)+줄 패딩(4px)+블록 패딩(20px)으로 본문이 56px 밀려 있었음
+// → 블록 왼쪽 패딩·줄 패딩을 줄이고 번호와 코드 사이를 좁혀 40px 안팎으로
+#{$code-figure} > pre > code:has(> [data-line]:nth-child(6)) {
+  padding-left: 0.75rem;
+}
+#{$code-figure} > pre > code:has(> [data-line]:nth-child(6)) > [data-line] {
+  padding-left: 0;
+}
+#{$code-figure} > pre > code > [data-line]::before {
+  margin-right: 0.85rem;
+  font-size: 0.8em;
+  color: color-mix(in srgb, var(--gray) 40%, transparent);
+}
+
+// 언어 이름 라벨(우상단). hover 시 나오는 복사 버튼과 겹치지 않게 그때는 숨김
+#{$code-figure} > pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-family: var(--codeFont);
+  font-size: 0.7rem;
+  color: var(--gray);
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+#{$code-figure}:hover > pre[data-language]::before {
+  opacity: 0;
+}
+
+#{$code-figure} > pre:is([data-language="plaintext"], [data-language="text"])::before {
+  content: none;
+}
