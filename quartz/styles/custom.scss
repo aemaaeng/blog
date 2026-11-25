@@ -1075,3 +1075,54 @@ $post-page: ":root:root:root body:not([data-slug='index'])";
 #{$post-page} .recent-notes .recent-li:nth-child(n + 6) {
   display: none;
 }
+
+// ── 백링크: 위 글 목록과 같은 "작은 라벨 + 목록" 형식으로 ──
+// 테마 기본은 제목이 21px 굵게(본문 소제목보다 큼), 박스 안쪽 여백 12px로 들여써져 목록과 줄이 안 맞음
+:root:root:root .page-footer .backlinks {
+  padding: 0;
+  margin-top: 2.5rem;
+}
+:root:root:root .page-footer .backlinks > h3 {
+  margin: 0 0 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--gray);
+}
+:root:root:root .page-footer .backlinks > ul {
+  margin: 0;
+  padding: 0;
+  max-height: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+:root:root:root .page-footer .backlinks > ul > li {
+  margin: 0 0 0.6rem;
+}
+:root:root:root .page-footer .backlinks > ul > li > a {
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(85, 94, 104); // 글 목록 제목과 같은 색
+}
+:root:root:root[saved-theme="dark"] .page-footer .backlinks > ul > li > a {
+  color: var(--darkgray);
+}
+
+// ── 헤더: 사이트 이름 ↔ breadcrumb ──
+// 이름(27px) 바로 아래 13px 간격에 본문 크기(16px) 분홍 링크가 붙어 이름과 한 덩어리로 보였음
+// → 간격을 넓히고 breadcrumb은 작은 회색 경로로(현재 위치 안내 정도의 비중). hover 때만 강조색.
+:root:root:root .page-header .breadcrumb-container {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+}
+:root:root:root .page-header .breadcrumb-element a {
+  color: var(--gray);
+  transition: color 0.15s ease;
+}
+:root:root:root .page-header .breadcrumb-element a:hover {
+  color: var(--secondary);
+}
+:root:root:root .page-header .breadcrumb-element:last-child a {
+  color: var(--darkgray);
+}
