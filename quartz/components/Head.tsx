@@ -137,6 +137,8 @@ export default (() => {
             __html: `(function(){var D=${recentDescriptionsJson};function slugOf(a){var h=a.getAttribute("href")||"";try{h=decodeURIComponent(h);}catch(e){}return h.replace(/^(?:\\.\\.?\\/)+/,"").replace(/^\\//,"").replace(/\\/$/,"").replace(/#.*$/,"");}function decorate(){var cur=document.body.dataset.slug||"";document.querySelectorAll(".backlinks > h3").forEach(function(h){h.textContent="이 글을 언급한 글";});document.querySelectorAll(".recent-notes .recent-li").forEach(function(li){var a0=li.querySelector(".desc h3 a");if(a0)li.classList.toggle("is-current",slugOf(a0)===cur);if(li.dataset.descBound==="true")return;var a=li.querySelector(".desc h3 a");if(!a)return;li.dataset.descBound="true";var k=slugOf(a);if(!Object.prototype.hasOwnProperty.call(D,k))return;var d=D[k];if(!d)return;var h3=a.closest("h3");if(!h3)return;var p=document.createElement("p");p.className="recent-desc";p.textContent=d;h3.insertAdjacentElement("afterend",p);});}function run(){decorate();setTimeout(decorate,150);setTimeout(decorate,400);}document.addEventListener("DOMContentLoaded",run);document.addEventListener("nav",run);})();`,
           }}
         />
+        {/* 오노추(오늘의 노래 추천) 위젯. 로직은 quartz/static/onochu.js, 스타일은 custom.scss */}
+        <script src={joinSegments(baseDir, "static/onochu.js")} defer></script>
         {/* 모바일 푸터의 "맨 위로" 버튼. footer는 플러그인 소관이라 DOM에 주입하고, SPA 이동(nav)마다 다시 붙인다. 표시 여부는 custom.scss(모바일만). */}
         <script
           dangerouslySetInnerHTML={{
