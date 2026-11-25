@@ -816,6 +816,11 @@ body[data-slug="tags/index"] .page-listing ul.section-ul {
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+  // 목록 들여쓰기: 브라우저 기본 40px가 단계마다 쌓여 2단계면 본문 폭의 1/4가 비어 버림
+  // → 단계당 1.4rem(약 22px). 번호("10.")·불릿이 잘리지 않는 최소 폭
+  :root:root:root article :is(ul, ol) {
+    padding-left: 1.4rem;
+  }
   // 글 목록 제목이 좁은 화면에서 본문 h2만큼 커서 목록이 길어짐
   :root:root:root .recent-notes .recent-li h3 {
     font-size: 1.1rem;
