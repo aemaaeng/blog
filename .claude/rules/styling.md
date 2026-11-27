@@ -39,6 +39,7 @@ paths:
 ## 유지하기로 한 결정
 
 - 본문 `word-break`는 `normal` 그대로. `keep-all`로 바꾸면 모바일에서 오른쪽 여백이 크게 남아 일부러 되돌린 것이다.
+- 본문 `text-wrap: pretty`는 Safari에서만 끈다(`@supports (hanging-punctuation: first)`). Safari는 문단 전체를 다시 배분해 한국어 줄을 일찍 끊어서 오른쪽 여백이 크게 남는다.
 - 글 하단 목록 라벨은 "글 목록" 유지 (현재 글도 목록에 남기 때문에 "다른 글"은 맞지 않음).
 - 본문 링크 hover 팝오버는 끔(`enablePopovers: false`). 검색 결과 미리보기는 켬.
 

@@ -840,6 +840,14 @@ body[data-slug="tags/index"] .page-listing ul.section-ul {
 :root:root:root article :is(p, li) {
   text-wrap: pretty;
 }
+// Safari는 pretty를 문단 전체에 적용해서, 한국어(글자마다 줄바꿈 가능)에서 줄을 일찍 끊어
+// 오른쪽 여백이 크게 남는다. Chrome은 마지막 몇 줄만 손봐서 문제없다.
+// hanging-punctuation은 Safari만 지원하므로 Safari 감지용으로 쓴다.
+@supports (hanging-punctuation: first) {
+  :root:root:root article :is(p, li) {
+    text-wrap: wrap;
+  }
+}
 
 // ── 본문 @YYYY-MM-DD → "추가" 날짜 뱃지 (plugins/date-badge) ──
 .date-badge {
