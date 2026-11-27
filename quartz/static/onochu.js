@@ -234,7 +234,11 @@
     trigger.type = "button"
     trigger.className = "onochu-trigger"
     trigger.setAttribute("aria-expanded", "false")
-    trigger.textContent = "\u266A\uFE0E 오노추?" // ♪ + 텍스트 표기 선택자(이모지로 안 그려지게)
+    // ♪ 문자는 Safari에서 대체 폰트로 작게 그려져서 SVG로 그린다 (브라우저마다 크기 동일)
+    trigger.innerHTML =
+      '<svg class="onochu-note" viewBox="0 0 16 16" aria-hidden="true">' +
+      '<path d="M8.5 1.5v8.6A2.75 2.75 0 1 0 10 12.5V4.6c1.8.5 2.9 1.7 3.2 3.6.9-3.1-1-5.6-4.7-6.7z"/>' +
+      "</svg>오노추?"
     var panel = document.createElement("div")
     panel.className = "onochu-panel"
     panel.hidden = true
@@ -268,6 +272,30 @@
     })
   }
   document.addEventListener("click", closeAll)
+
+  // 모바일: 패널이 화면에 고정(fixed)이라 스크롤하면 버튼과 떨어진 채 본문을 가린다 → 스크롤하면 닫는다.
+  // 열 때 생기는 미세한 흔들림은 무시하도록 40px 이상 움직였을 때만. PC는 패널이 헤더를 따라가므로 그대로 둔다.
+  var mobile = window.matchMedia("(max-width: 800px)")
+  var openedAt = null
+  document.addEventListener(
+    "click",
+    function (e) {
+      if (e.target.closest && e.target.closest(".onochu-trigger")) openedAt = window.scrollY
+    },
+    true,
+  )
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!mobile.matches || openedAt === null) return
+      if (!document.querySelector(".onochu-panel:not([hidden])")) return (openedAt = null)
+      if (Math.abs(window.scrollY - openedAt) > 40) {
+        closeAll()
+        openedAt = null
+      }
+    },
+    { passive: true },
+  )
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeAll()
   })
