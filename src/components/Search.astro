@@ -131,6 +131,7 @@
     const list = d.querySelector(".search-results")!
     const panel = d.querySelector<HTMLElement>(".search-panel")!
     panel.hidden = !query
+    panel.classList.toggle("is-empty", !results.length)
     if (!query) return
     if (!results.length) {
       list.innerHTML = `<li class="search-empty">검색 결과가 없습니다</li>`
@@ -168,7 +169,9 @@
       results = []
       dialog().querySelector(".search-results")!.innerHTML =
         `<li class="search-empty">검색 색인이 없습니다 (빌드 결과에서만 동작)</li>`
-      dialog().querySelector<HTMLElement>(".search-panel")!.hidden = false
+      const panel = dialog().querySelector<HTMLElement>(".search-panel")!
+      panel.hidden = false
+      panel.classList.add("is-empty")
       return
     }
     const res = await pf.debouncedSearch(query, {}, 150)
@@ -271,6 +274,17 @@
     overflow: hidden;
   }
   .search-panel[hidden] {
+    display: none;
+  }
+  /* 결과가 없으면 안내 한 줄만 */
+  .search-panel.is-empty {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .search-panel.is-empty .search-results {
+    border-right: none;
+  }
+  .search-panel.is-empty .search-preview {
     display: none;
   }
 
