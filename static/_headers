@@ -1,0 +1,14 @@
+# Cloudflare Pages 응답 헤더
+
+# HTML 등 기본: 받아 둔 지 60초 안이면 바로 쓰고 뒤에서 새로 확인한다.
+# Cloudflare 기본값(max-age=0, must-revalidate)이면 링크에 마우스를 올렸을 때 미리 받은 HTML(prefetch)을
+# 클릭할 때 버리고 다시 받아서, 페이지 이동이 서버 응답 시간(~200ms)만큼 느렸다.
+/*
+  Cache-Control: public, max-age=0, stale-while-revalidate=60
+
+# 빌드 결과 CSS·JS는 파일 이름에 해시가 있어 내용이 바뀌면 이름도 바뀐다 → 1년 캐시.
+# 배포 직후 이전 HTML이 잠깐 쓰여도 그 HTML이 가리키는 CSS·JS는 브라우저에 남아 있어 깨지지 않는다.
+# 위 규칙과 겹치면 값이 쉼표로 합쳐지므로 먼저 떼어 낸다(!).
+/_astro/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
