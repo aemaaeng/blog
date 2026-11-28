@@ -30,7 +30,7 @@
 
 ### 미리 처리할 것
 
-1. **빌드 출력 폴더** — 확인 필요
+1. **빌드 출력 폴더** — 확인 완료 (2026-11-28: 빌드 명령 `npm run build`, 출력 `public`, 자동 배포 켜짐)
    - Cloudflare 빌드 설정(빌드 명령, 출력 폴더)은 브랜치 공통이고 출력 폴더는 `public`이다. Astro에서 `public/`은 정적 파일 **입력** 폴더라 이름이 겹친다.
    - 운영 설정을 건드리지 않도록 Astro 쪽에서 맞춘다: `astro.config`에 `outDir: "public"`, `publicDir: "static"`.
    - 빌드 명령이 `npm run build`가 아니라 `npx quartz build`처럼 Quartz를 직접 부르고 있다면, 브랜치에서 빌드가 실패한다. 이 경우 대시보드에서 `npm run build`로 바꾼다(`main`도 같은 결과라 영향 없음).
@@ -87,7 +87,7 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
 - 지금 주소는 Quartz 규칙으로 만들어진다. 파일 이름을 소문자로 바꾸고, 공백은 `-`, `?` 같은 기호는 제거한다.
   - 예: `Streaming SSR.md` → `/streaming-ssr`, `React.lazy는 300ms 느리다?.md` → `/react.lazy는-300ms-느리다`
 - Astro에서 같은 규칙의 slug 함수를 만든다.
-- 시작할 때 현재 `public/`의 `*.html` 목록을 `docs/urls.txt`로 저장해 두고, Astro 빌드 결과와 하나도 빠짐없이 같은지 비교하는 스크립트로 검증한다.
+- 현재 주소 21개와 `/index.xml`, `/sitemap.xml`을 `docs/urls.txt`에 저장해 뒀다(전부 200 확인). 이 목록을 Astro 빌드 결과와 하나도 빠짐없이 같은지 비교하는 스크립트로 검증한다.
 
 ## 스타일
 
@@ -106,7 +106,7 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
 
 | 단계         | 내용                                                                                                   | 끝났다는 기준                                   |
 | ------------ | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
-| 0. 준비      | `quartz-final` 태그, Cloudflare 빌드 명령 확인, `docs/urls.txt` 저장                                   | `main` 배포 정상                                |
+| 0. 준비      | `quartz-final` 태그, Cloudflare 빌드 명령 확인, `docs/urls.txt` 저장 (완료)                            | `main` 배포 정상                                |
 | 1. 뼈대      | `migrate/astro` 브랜치, Astro 설치, `content/`를 Content Collection으로 읽기, 홈과 글 페이지 최소 버전 | 미리보기 주소에서 모든 글이 열림                |
 | 2. 마크다운  | 위키링크, 줄바꿈, callout, 날짜 뱃지, 코드블록                                                         | 9개 글이 지금 사이트와 내용상 같음              |
 | 3. 연결      | 백링크, 하단 글 목록, 태그 페이지, 404                                                                 | 위키링크와 백링크가 모두 동작하고 깨진 링크 0개 |
