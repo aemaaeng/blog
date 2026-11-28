@@ -9,7 +9,7 @@ interface Props {
   /** 공유 미리보기 이미지 경로 (없으면 사이트 기본 이미지) */
   image?: string
 }
-const { title, description, crumb, image = "/og-image.png" } = Astro.props
+const { title, description, crumb, image = "/og/index.png" } = Astro.props
 const url = new URL(Astro.url.pathname.replace(/\.html$/, ""), Astro.site)
 const imageUrl = new URL(image, Astro.site)
 ---

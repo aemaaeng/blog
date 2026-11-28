@@ -20,7 +20,12 @@ const { post, backlinks, recent } = Astro.props
 const { Content, remarkPluginFrontmatter } = await render(post)
 ---
 
-<Base title={post.data.title} description={post.data.description} crumb={post.data.title}>
+<Base
+  title={post.data.title}
+  description={post.data.description}
+  crumb={post.data.title}
+  image={`/og/${post.id}.png`}
+>
   <article>
     <h1 class="article-title">{post.data.title}</h1>
     <ul class="tags">
