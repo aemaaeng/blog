@@ -1,6 +1,6 @@
 # Quartz → Astro 이사 계획
 
-> 작성: 2026-11-28 · 상태: 1단계 진행 중 (`migrate/astro`)
+> 작성: 2026-11-28 · 상태: 1단계 완료, 2단계 대기 (`migrate/astro`)
 
 ## 왜 옮기나
 
@@ -127,6 +127,11 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
   - 글 주소 8개와 홈이 `docs/urls.txt`와 일치 (`node scripts/check-urls.mjs`)
   - `content/`는 prettier 대상에서 뺌 (Obsidian이 관리)
   - `CLAUDE.md`·`.claude/rules`는 아직 Quartz 기준이라 7단계에서 갱신
+  - 미리보기 배포 성공: https://migrate-astro.hyemin-jardin.pages.dev
+    - Cloudflare 설정: Preview branch를 Custom `migrate/*`로, **Preview 환경** `NODE_VERSION`을 24.22.3으로 (Production은 22.16.0 그대로)
+    - 환경 변수는 Production·Preview가 따로다. `NODE_VERSION` 변수가 `.node-version`보다 우선한다
+    - Retry는 첫 배포 때 설정을 재사용한다. 설정을 바꾼 뒤엔 새 커밋으로 배포한다
+    - 404.html이 없으면 Cloudflare가 없는 주소에 홈을 200으로 돌려준다. 그래서 주소 검증은 반드시 `scripts/check-urls.mjs`로 빌드 결과를 보고 한다 (3단계에서 404 페이지 추가)
 
 ## 정할 것
 
