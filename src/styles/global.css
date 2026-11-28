@@ -273,11 +273,12 @@ img {
   background: rgba(255, 208, 0, 0.3);
 }
 
+/* 외부 링크 아이콘은 링크 색(분홍)이 아니라 글자색. Quartz 시절(fill: var(--dark))과 같다 */
 .prose .external-icon {
   width: 0.65em;
   height: 0.65em;
   margin: 0 0.15em;
-  fill: currentColor;
+  fill: var(--text);
 }
 
 .prose hr {
