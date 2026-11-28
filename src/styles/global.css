@@ -139,6 +139,37 @@ img {
   text-decoration-thickness: 2px;
 }
 
+/* 헤더 아이콘 버튼 (검색·다크 모드). 36px는 탭 타깃 최소치, 아이콘은 18px.
+   아이콘은 --icon(SVG)을 mask로 그려 글자색을 따른다 → 라이트/다크 자동 */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.icon-button::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  mask: var(--icon) center / contain no-repeat;
+}
+.icon-button:hover {
+  background: var(--bg-hover);
+}
+.icon-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* 목록 라벨 ("글 목록", "이 글을 언급한 글") */
 .section-label {
   margin: 0 0 1rem;

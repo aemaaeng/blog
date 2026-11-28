@@ -1,4 +1,7 @@
 ---
+import { ClientRouter } from "astro:transitions"
+import Search from "../components/Search.astro"
+import ThemeToggle from "../components/ThemeToggle.astro"
 import "../styles/global.css"
 
 interface Props {
@@ -15,7 +18,7 @@ const imageUrl = new URL(image, Astro.site)
 ---
 
 <!doctype html>
-<html lang="ko">
+<html lang="ko" transition:animate="none">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -40,19 +43,33 @@ const imageUrl = new URL(image, Astro.site)
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap"
     />
-    <!-- 첫 화면이 깜빡이지 않게 그리기 전에 테마를 정한다. 저장 키 "theme"는 Quartz 시절과 같다 -->
+    <!-- 첫 화면이 깜빡이지 않게 그리기 전에 테마를 정한다. 저장 키 "theme"는 Quartz 시절과 같다.
+         페이지 이동(View Transitions)은 <html> 속성을 새 문서 것으로 바꾸므로 이동 뒤에도 다시 정한다 -->
     <script is:inline>
-      document.documentElement.dataset.theme =
-        localStorage.getItem("theme") ??
-        (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+      ;(() => {
+        const dark = matchMedia("(prefers-color-scheme: dark)")
+        const apply = () =>
+          (document.documentElement.dataset.theme =
+            localStorage.getItem("theme") ?? (dark.matches ? "dark" : "light"))
+        apply()
+        if (window.__theme) return
+        window.__theme = true
+        document.addEventListener("astro:after-swap", apply)
+        dark.addEventListener("change", apply) // 직접 고른 적이 없으면 시스템 설정을 따라간다
+      })()
     </script>
+    <!-- 페이지 이동을 새로고침 없이 (Quartz SPA와 같은 동작). 이동하면 맨 위로 -->
+    <ClientRouter />
   </head>
   <body>
     <div class="page">
       <header class="site-header">
         <div class="masthead">
           <a class="site-title" href="/">Hyemin Kim</a>
-          <div class="toolbar"><slot name="toolbar" /></div>
+          <div class="toolbar">
+            <Search />
+            <ThemeToggle />
+          </div>
         </div>
         {
           crumb && (

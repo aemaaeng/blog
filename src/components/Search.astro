@@ -1,0 +1,353 @@
+---
+// 검색. 빌드 후 Pagefind가 public/pagefind/에 만든 색인을 읽는다(npm run build에 포함).
+// 그래서 개발 서버(astro dev)에서는 결과가 나오지 않는다 → npm run build && npm run preview로 확인.
+// 생김새는 Quartz 시절 검색 모달과 같다: 위에 입력 칸, 아래 왼쪽 결과 목록, 오른쪽 미리보기(PC만).
+---
+
+<button class="icon-button search-open" type="button" aria-label="검색 (⌘K)"></button>
+
+<dialog class="search" aria-label="검색">
+  <input
+    class="search-input"
+    type="search"
+    placeholder="검색어를 입력하세요"
+    autocomplete="off"
+    spellcheck="false"
+  />
+  <div class="search-panel" hidden>
+    <ul class="search-results" role="listbox"></ul>
+    <div class="search-preview"></div>
+  </div>
+</dialog>
+
+<script>
+  import { navigate } from "astro:transitions/client"
+
+  type Result = { url: string; title: string; excerpt: string }
+  type Pagefind = {
+    init(): Promise<void>
+    debouncedSearch(
+      q: string,
+      opts?: object,
+      ms?: number,
+    ): Promise<{ results: { data(): Promise<PagefindData> }[] } | null>
+  }
+  type PagefindData = { url: string; excerpt: string; meta: { title?: string } }
+
+  let pagefind: Promise<Pagefind | null> | null = null
+  function loadPagefind() {
+    // 색인은 빌드 결과에만 있어서 번들러가 따라가지 않게 주소를 변수로 둔다
+    const path = "/pagefind/pagefind.js"
+    pagefind ??= import(/* @vite-ignore */ path)
+      .then(async (pf: Pagefind) => {
+        await pf.init()
+        return pf
+      })
+      .catch(() => null)
+    return pagefind
+  }
+
+  const dialog = () => document.querySelector<HTMLDialogElement>("dialog.search")!
+  const wide = matchMedia("(min-width: 801px)")
+  let results: Result[] = []
+  let active = 0
+  let query = ""
+
+  function open() {
+    const d = dialog()
+    if (d.open) return
+    d.showModal()
+    const input = d.querySelector<HTMLInputElement>(".search-input")!
+    input.select()
+    loadPagefind()
+  }
+
+  // 미리보기는 글 페이지를 받아 본문(article)만 꺼내 쓴다. 한 번 받은 글은 다시 받지 않는다
+  const pages = new Map<string, Promise<Element | null>>()
+  function article(url: string) {
+    if (!pages.has(url))
+      pages.set(
+        url,
+        fetch(url)
+          .then((r) => r.text())
+          .then((html) => new DOMParser().parseFromString(html, "text/html").querySelector("article")),
+      )
+    return pages.get(url)!
+  }
+
+  // 미리보기 안에서 검색어를 <mark>로 표시
+  function highlight(root: Element, words: string[]) {
+    if (!words.length) return
+    const pattern = new RegExp(
+      `(${words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`,
+      "gi",
+    )
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+    const nodes: Text[] = []
+    while (walker.nextNode()) nodes.push(walker.currentNode as Text)
+    for (const node of nodes) {
+      if (!pattern.test(node.data)) continue
+      pattern.lastIndex = 0
+      const frag = document.createDocumentFragment()
+      node.data.split(pattern).forEach((part, i) => {
+        if (i % 2) {
+          const mark = document.createElement("mark")
+          mark.textContent = part
+          frag.append(mark)
+        } else if (part) frag.append(part)
+      })
+      node.replaceWith(frag)
+    }
+  }
+
+  async function showPreview() {
+    const preview = dialog().querySelector(".search-preview")!
+    const result = results[active]
+    if (!wide.matches || !result) return preview.replaceChildren()
+    const found = await article(result.url)
+    if (results[active] !== result) return // 그 사이 선택이 바뀜
+    if (!found) return preview.replaceChildren()
+    const copy = found.cloneNode(true) as Element
+    highlight(copy, query.split(/\s+/).filter(Boolean))
+    preview.replaceChildren(copy)
+    preview.scrollTop = 0
+    copy.querySelector("mark")?.scrollIntoView({ block: "center" })
+  }
+
+  function select(i: number) {
+    active = i
+    dialog()
+      .querySelectorAll(".search-result")
+      .forEach((el, j) => {
+        el.classList.toggle("is-active", j === i)
+        el.setAttribute("aria-selected", String(j === i))
+        if (j === i) el.scrollIntoView({ block: "nearest" })
+      })
+    showPreview()
+  }
+
+  function render() {
+    const d = dialog()
+    const list = d.querySelector(".search-results")!
+    const panel = d.querySelector<HTMLElement>(".search-panel")!
+    panel.hidden = !query
+    if (!query) return
+    if (!results.length) {
+      list.innerHTML = `<li class="search-empty">검색 결과가 없습니다</li>`
+      d.querySelector(".search-preview")!.replaceChildren()
+      return
+    }
+    list.replaceChildren(
+      ...results.map((r, i) => {
+        const li = document.createElement("li")
+        li.className = "search-result"
+        li.setAttribute("role", "option")
+        const a = document.createElement("a")
+        a.href = r.url
+        const title = document.createElement("strong")
+        title.textContent = r.title
+        const excerpt = document.createElement("p")
+        excerpt.innerHTML = r.excerpt // Pagefind가 이스케이프하고 <mark>만 넣은 HTML
+        a.append(title, excerpt)
+        a.addEventListener("mouseenter", () => select(i))
+        li.append(a)
+        return li
+      }),
+    )
+    select(0)
+  }
+
+  async function search(q: string) {
+    query = q.trim()
+    if (!query) {
+      results = []
+      return render()
+    }
+    const pf = await loadPagefind()
+    if (!pf) {
+      results = []
+      dialog().querySelector(".search-results")!.innerHTML =
+        `<li class="search-empty">검색 색인이 없습니다 (빌드 결과에서만 동작)</li>`
+      dialog().querySelector<HTMLElement>(".search-panel")!.hidden = false
+      return
+    }
+    const res = await pf.debouncedSearch(query, {}, 150)
+    if (!res) return // 더 새 입력이 있음
+    const data = await Promise.all(res.results.slice(0, 10).map((r) => r.data()))
+    results = data.map((d) => ({
+      // 빌드 결과 파일 이름(slug.html)이 아니라 실제 주소(/slug)로
+      url: d.url.replace(/\.html$/, ""),
+      title: d.meta.title ?? d.url,
+      excerpt: d.excerpt,
+    }))
+    render()
+  }
+
+  // 페이지 이동(View Transitions) 뒤에도 동작하게 전부 문서 단위로 한 번만 건다
+  document.addEventListener("click", (e) => {
+    const target = e.target as Element
+    if (target.closest?.(".search-open")) return open()
+    const d = dialog()
+    if (!d?.open) return
+    if (target === d) return d.close() // 바깥(배경) 클릭
+    const link = target.closest?.(".search-result a")
+    if (link) d.close() // 이동은 링크(View Transitions)가 한다
+  })
+
+  document.addEventListener("input", (e) => {
+    const t = e.target as HTMLElement
+    if (t.matches?.(".search-input")) search((t as HTMLInputElement).value)
+  })
+
+  document.addEventListener("keydown", (e) => {
+    const d = dialog()
+    if (!d) return
+    const typing = e.target instanceof HTMLElement && e.target.matches("input, textarea, [contenteditable]")
+    if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || (e.key === "/" && !typing && !d.open)) {
+      e.preventDefault()
+      return d.open ? d.close() : open()
+    }
+    if (!d.open || !results.length) return
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault()
+      const n = results.length
+      select((active + (e.key === "ArrowDown" ? 1 : n - 1)) % n)
+    } else if (e.key === "Enter" && !e.isComposing) {
+      e.preventDefault()
+      const url = results[active]?.url
+      d.close()
+      if (url) navigate(url)
+    }
+  })
+
+  wide.addEventListener("change", showPreview)
+</script>
+
+<style>
+  .search-open {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  }
+
+  /* 모달: 화면 위쪽에 입력 칸 카드, 그 아래 결과 카드 */
+  .search {
+    width: min(830px, calc(100vw - 32px));
+    max-width: none;
+    max-height: none;
+    margin: 96px auto 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    overflow: visible;
+  }
+  .search::backdrop {
+    background: color-mix(in srgb, var(--bg-outer) 55%, transparent);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .search-input {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.7em 1em;
+    border: 1px solid var(--divider);
+    border-radius: 10px;
+    background: var(--bg);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    color: var(--text);
+    font: inherit;
+    font-size: 1rem;
+    outline: none;
+  }
+  .search-input::-webkit-search-cancel-button {
+    display: none;
+  }
+  .search-panel {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    height: min(560px, calc(100vh - 220px));
+    border: 1px solid var(--divider);
+    border-radius: 12px;
+    background: var(--bg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .search-panel[hidden] {
+    display: none;
+  }
+
+  .search-results {
+    margin: 0;
+    padding: 0.5rem;
+    list-style: none;
+    overflow-y: auto;
+    border-right: 1px solid var(--divider);
+  }
+  /* 결과는 스크립트가 만들어서 스코프 속성이 없다 → :global */
+  .search-results :global(.search-result a) {
+    display: block;
+    padding: 0.65rem 0.8rem;
+    border-radius: 8px;
+    color: var(--text);
+  }
+  .search-results :global(.search-result.is-active a) {
+    background: color-mix(in srgb, var(--text) 6%, transparent);
+  }
+  .search-results :global(.search-result strong) {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+  /* 요약은 미리보기가 없는 모바일에서만 */
+  .search-results :global(.search-result p) {
+    display: none;
+  }
+  .search-results :global(.search-empty) {
+    padding: 0.65rem 0.8rem;
+    font-size: 0.9rem;
+    color: var(--gray);
+  }
+
+  /* 미리보기: 글 본문을 그대로 보여주되 맨 위 구분선은 뺀다 */
+  .search-preview {
+    padding: 1.5rem 2rem;
+    overflow-y: auto;
+  }
+  .search-preview :global(.article-title) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+  .search :global(mark) {
+    padding: 0 0.1em;
+    border-radius: 3px;
+    background: color-mix(in srgb, #f5d547 55%, transparent);
+    color: inherit;
+  }
+
+  @media (max-width: 800px) {
+    .search {
+      margin-top: 16px;
+    }
+    .search-panel {
+      grid-template-columns: 1fr;
+      height: auto;
+      max-height: calc(100vh - 120px);
+    }
+    .search-results {
+      border-right: none;
+    }
+    .search-preview {
+      display: none;
+    }
+    .search-results :global(.search-result p) {
+      display: -webkit-box;
+      margin: 0.25rem 0 0;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--gray);
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+</style>

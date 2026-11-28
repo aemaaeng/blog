@@ -119,5 +119,6 @@ export async function renderOg({ title, description, meta, tags = [] }: OgInput)
 
   const tree = h("div", { display: "flex", width: 1200, height: 630, background: color.bg }, [page])
   const svg = await satori(tree as never, { width: 1200, height: 630, fonts })
-  return new Resvg(svg).render().asPng()
+  // Response가 받는 형태(Uint8Array)로
+  return new Uint8Array(new Resvg(svg).render().asPng())
 }

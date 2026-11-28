@@ -1,0 +1,26 @@
+---
+// 다크 모드 토글. 고른 값은 localStorage "theme"에 저장한다(Quartz 시절과 같은 키라 기존 방문자 설정이 이어진다).
+// 처음 그릴 때의 테마는 Base.astro head의 inline 스크립트가 정한다.
+---
+
+<button class="icon-button theme-toggle" type="button" aria-label="다크 모드 전환"></button>
+
+<script>
+  // 페이지 이동(View Transitions)으로 버튼이 바뀌어도 동작하게 문서에 한 번만 건다
+  document.addEventListener("click", (e) => {
+    if (!(e.target instanceof Element) || !e.target.closest(".theme-toggle")) return
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark"
+    document.documentElement.dataset.theme = next
+    localStorage.setItem("theme", next)
+  })
+</script>
+
+<style>
+  /* 지금 테마를 아이콘으로 보여준다 (라이트 = 해, 다크 = 달) */
+  .theme-toggle {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41'/%3E%3C/svg%3E");
+  }
+  :global([data-theme="dark"]) .theme-toggle {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z'/%3E%3C/svg%3E");
+  }
+</style>
