@@ -1,15 +1,9 @@
 .DS_Store
-.gitignore
 node_modules
+# Astro 빌드 결과 (Cloudflare Pages 출력 폴더가 public이라 outDir을 public으로 둠)
 public
-prof
-tsconfig.tsbuildinfo
+.astro
 .obsidian
-.quartz-cache
 private/
-.replit
-replit.nix
-.quartz/
-quartz/cli/tui/dist/
 .dev.vars
 .wrangler/

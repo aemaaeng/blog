@@ -1,0 +1,25 @@
+---
+import { getEntry, render } from "astro:content"
+import Base from "../layouts/Base.astro"
+import { formatDate, getPosts } from "../lib/posts"
+
+const intro = await getEntry("home", "index")
+if (!intro) throw new Error("content/index.md가 없습니다")
+const { Content } = await render(intro)
+const posts = await getPosts()
+---
+
+<Base title={intro.data.title} description={intro.data.description}>
+  <Content />
+  <ul>
+    {
+      posts.map((post) => (
+        <li>
+          <a href={`/${post.id}`}>{post.data.title}</a>
+          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+          <p>{post.data.description}</p>
+        </li>
+      ))
+    }
+  </ul>
+</Base>

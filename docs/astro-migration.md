@@ -1,6 +1,6 @@
 # Quartz → Astro 이사 계획
 
-> 작성: 2026-11-28 · 상태: 계획
+> 작성: 2026-11-28 · 상태: 1단계 진행 중 (`migrate/astro`)
 
 ## 왜 옮기나
 
@@ -116,6 +116,17 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
 | 7. 전환      | `main`에 머지, 배포 확인, Quartz 파일과 `upstream` 리모트 정리, `CLAUDE.md`·`.claude/rules` 갱신       | 실제 사이트 정상, 롤백 방법 확인                |
 
 1~3단계가 이사의 핵심이다. 여기까지 되면 Quartz 없이도 블로그가 돈다. 4~5단계는 나눠서 해도 된다.
+
+## 진행 기록
+
+- 2026-11-28 1단계
+  - Quartz 파일 삭제
+  - Astro 7 설치. Node 22.23 이상이 필요해서 `.node-version`을 24로 바꿈. 로컬은 `nvm use 24`
+  - `content/`를 Content Collection으로 읽음
+  - 홈과 글 페이지 최소 버전
+  - 글 주소 8개와 홈이 `docs/urls.txt`와 일치 (`node scripts/check-urls.mjs`)
+  - `content/`는 prettier 대상에서 뺌 (Obsidian이 관리)
+  - `CLAUDE.md`·`.claude/rules`는 아직 Quartz 기준이라 7단계에서 갱신
 
 ## 정할 것
 
