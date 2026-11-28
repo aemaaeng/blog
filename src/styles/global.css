@@ -265,6 +265,14 @@ img {
   vertical-align: middle;
 }
 
+/* 본문 내부 링크(위키링크): 연한 노란 배경. Quartz 시절(things 테마)과 같은 모양이고,
+   색만으로 링크를 구분하지 않게 해 준다(접근성: link-in-text-block) */
+.prose a.internal {
+  padding: 0 0.1rem;
+  border-radius: 5px;
+  background: rgba(255, 208, 0, 0.3);
+}
+
 .prose .external-icon {
   width: 0.65em;
   height: 0.65em;
