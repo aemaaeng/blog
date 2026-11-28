@@ -6,8 +6,12 @@ interface Props {
   description?: string
   /** 글 페이지 breadcrumb에 보일 현재 위치 (없으면 breadcrumb 없음) */
   crumb?: string
+  /** 공유 미리보기 이미지 경로 (없으면 사이트 기본 이미지) */
+  image?: string
 }
-const { title, description, crumb } = Astro.props
+const { title, description, crumb, image = "/og-image.png" } = Astro.props
+const url = new URL(Astro.url.pathname.replace(/\.html$/, ""), Astro.site)
+const imageUrl = new URL(image, Astro.site)
 ---
 
 <!doctype html>
@@ -17,7 +21,19 @@ const { title, description, crumb } = Astro.props
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={url} />
     <link rel="icon" href="/icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="Hyemin Kim" href="/index.xml" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <meta property="og:site_name" content="Hyemin Kim" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={url} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
