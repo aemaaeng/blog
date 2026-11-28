@@ -3,7 +3,13 @@ import Base from "../layouts/Base.astro"
 ---
 
 <Base title="Not Found">
-  <h1>404</h1>
-  <p>페이지가 존재하지 않거나 비공개 설정이 되어 있습니다.</p>
+  <h1 class="article-title">404</h1>
+  <p class="message">페이지가 존재하지 않거나 비공개 설정이 되어 있습니다.</p>
   <a href="/">홈페이지로 돌아가기</a>
 </Base>
+
+<style>
+  .message {
+    color: var(--text-body);
+  }
+</style>

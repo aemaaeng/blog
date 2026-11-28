@@ -10,7 +10,7 @@ interface Props {
 const { posts } = Astro.props
 ---
 
-<p>{posts.length}건의 항목</p>
+<p class="count">{posts.length}건의 항목</p>
 <ul class="post-list">
   {
     posts.map((post) => (
@@ -30,3 +30,39 @@ const { posts } = Astro.props
     ))
   }
 </ul>
+
+<style>
+  .count {
+    margin: 0 0 1.5rem;
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+  .post-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .post-list > li + li {
+    margin-top: 1.25rem;
+  }
+  time {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.8rem;
+    color: var(--text-meta);
+  }
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  h3 a {
+    color: var(--text);
+  }
+  h3 a:hover {
+    color: var(--accent);
+  }
+  .tags {
+    margin-top: 6px;
+  }
+</style>

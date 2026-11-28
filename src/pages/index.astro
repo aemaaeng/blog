@@ -1,7 +1,8 @@
 ---
 import { getEntry, render } from "astro:content"
+import PostFeed from "../components/PostFeed.astro"
 import Base from "../layouts/Base.astro"
-import { formatDate, getPosts } from "../lib/posts"
+import { getPosts } from "../lib/posts"
 
 const intro = await getEntry("home", "index")
 if (!intro) throw new Error("content/index.md가 없습니다")
@@ -10,16 +11,21 @@ const posts = await getPosts()
 ---
 
 <Base title={intro.data.title} description={intro.data.description}>
-  <Content />
-  <ul>
-    {
-      posts.map((post) => (
-        <li>
-          <a href={`/${post.id}`}>{post.data.title}</a>
-          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
-          <p>{post.data.description}</p>
-        </li>
-      ))
-    }
-  </ul>
+  <div class="prose intro">
+    <Content />
+  </div>
+  <hr />
+  <PostFeed posts={posts} />
 </Base>
+
+<style>
+  .intro {
+    margin-top: 1rem;
+  }
+  hr {
+    height: 1px;
+    margin: 2rem 0;
+    border: none;
+    background: var(--divider);
+  }
+</style>

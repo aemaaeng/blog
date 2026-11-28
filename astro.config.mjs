@@ -5,6 +5,7 @@ import remarkBreaks from "remark-breaks"
 import remarkBlockIds from "./src/markdown/block-ids"
 import remarkCallouts from "./src/markdown/callouts"
 import remarkDateBadge from "./src/markdown/date-badge"
+import remarkReadingTime from "./src/markdown/reading-time"
 import rehypeLinks from "./src/markdown/links"
 import remarkWikilinks from "./src/markdown/wikilinks"
 
@@ -27,6 +28,7 @@ export default defineConfig({
         remarkBlockIds,
         remarkDateBadge,
         remarkBreaks, // Obsidian처럼 한 줄 줄바꿈 = <br>
+        remarkReadingTime,
       ],
       rehypePlugins: [rehypeLinks],
     }),

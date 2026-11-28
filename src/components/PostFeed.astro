@@ -1,0 +1,105 @@
+---
+import type { CollectionEntry } from "astro:content"
+import { formatDate } from "../lib/posts"
+
+// "글 목록": 홈은 전체(큰 제목·요약 2줄), 글·태그 페이지 하단은 compact(작은 제목·요약 1줄).
+// 하단 목록에서는 지금 보고 있는 글을 빼지 않고 "현재 글"로 표시한다.
+interface Props {
+  posts: CollectionEntry<"posts">[]
+  current?: string
+  compact?: boolean
+}
+const { posts, current, compact = false } = Astro.props
+---
+
+<section class:list={["feed", { compact }]}>
+  <h2 class="section-label">글 목록</h2>
+  <ul>
+    {
+      posts.map((post) => (
+        <li>
+          <h3>
+            <a href={`/${post.id}`}>{post.data.title}</a>
+            {post.id === current && <span class="current-badge">현재 글</span>}
+          </h3>
+          <p class="desc">{post.data.description}</p>
+          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    margin-bottom: 1.6rem;
+  }
+  h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  h3 a {
+    color: var(--text);
+  }
+  h3 a:hover {
+    color: var(--accent);
+  }
+  .desc {
+    display: -webkit-box;
+    margin: 0 0 0.35rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-desc);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  time {
+    display: block;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--text-meta);
+  }
+
+  /* 글 하단: 본문 소제목(h3 1.05rem)보다 커서 글이 이어지는 것처럼 보이지 않게 한 단계 작고 촘촘하게 */
+  .compact li {
+    margin-bottom: 1.1rem;
+  }
+  .compact h3 {
+    margin-bottom: 0.2rem;
+    font-size: 1rem;
+  }
+  .compact .desc {
+    margin-bottom: 0.2rem;
+    font-size: 0.85rem;
+    -webkit-line-clamp: 1;
+  }
+
+  .current-badge {
+    display: inline-block;
+    margin-left: 0.5em;
+    padding: 0.05em 0.5em;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    vertical-align: 0.15em;
+    color: var(--gray);
+    background: color-mix(in srgb, var(--text) 6%, transparent);
+  }
+
+  @media (max-width: 800px) {
+    h3 {
+      font-size: 1.1rem;
+    }
+    .compact h3 {
+      font-size: 1rem;
+    }
+  }
+</style>

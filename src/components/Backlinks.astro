@@ -11,7 +11,7 @@ const { posts } = Astro.props
 {
   posts.length > 0 && (
     <section class="backlinks">
-      <h2>이 글을 언급한 글</h2>
+      <h2 class="section-label">이 글을 언급한 글</h2>
       <ul>
         {posts.map((post) => (
           <li>
@@ -22,3 +22,25 @@ const { posts } = Astro.props
     </section>
   )
 }
+
+<style>
+  /* 위 글 목록과 같은 "작은 라벨 + 목록" 형식 */
+  .backlinks {
+    margin-top: 2.5rem;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    margin: 0 0 0.6rem;
+  }
+  a {
+    font-weight: 600;
+    color: var(--gray);
+  }
+  a:hover {
+    color: var(--accent);
+  }
+</style>

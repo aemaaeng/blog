@@ -1,0 +1,516 @@
+/*
+ * 전역 스타일: 색·글꼴 변수, 기본 요소, 본문(마크다운) 스타일.
+ * 헤더·목록 같은 UI는 각 컴포넌트의 <style>에 둔다.
+ * 디자인 기준은 Quartz 시절 custom.scss에서 정리한 결정들(.claude/rules/styling.md)이다.
+ */
+
+@font-face {
+  font-family: "Pretendard Variable";
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/woff2/PretendardVariable.woff2")
+    format("woff2-variations");
+}
+
+/* ── 색 ── */
+:root {
+  color-scheme: light;
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+    "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --bg: #ffffff;
+  --bg-outer: #f6f7f8; /* 본문 칸 바깥 */
+  --bg-hover: #f6f7f8; /* 아이콘 버튼·칩 hover */
+  --text: #222222; /* 제목·목록·굵게 */
+  --text-body: #555e68; /* 본문 문단 */
+  --gray: #555e68; /* 라벨·날짜·breadcrumb */
+  --text-desc: #6f6f6f; /* 글 목록 한 줄 요약: 제목과 붙어 보이지 않게 한 단계 연하게 */
+  --text-meta: #696e74; /* 글 목록 날짜: opacity 대신 색으로 (대비 4.5:1 유지) */
+  --accent: hsl(336, 72%, 55%); /* 핑크: 링크·인용문 */
+  --accent-strong: hsl(336, 72%, 45%);
+  --tag: hsl(188, 46%, 34%);
+  /* 구분선: 거의 흰색인 회색은 흰 배경에서 안 보여서 글자색 20%로 */
+  --divider: color-mix(in srgb, var(--text) 20%, transparent);
+  --code-inline-bg: #eceef1;
+  --code-bg: color-mix(in srgb, var(--text) 4%, var(--bg));
+  --badge-text: #2f7a4f;
+  --badge-bg: #e5f2e9;
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1c2127;
+  --bg-outer: #181c20;
+  --bg-hover: #262c33;
+  --text: #dadada;
+  --text-body: #bec6cf;
+  --gray: #bec6cf;
+  --text-desc: #a3a3a6;
+  --text-meta: #8f959c;
+  --accent: #ef80ab; /* 어두운 배경에서 링크는 밝은 핑크 */
+  --accent-strong: #f6a5c4;
+  --tag: hsl(185, 55%, 72%);
+  --code-inline-bg: #303540;
+  --badge-text: #8fd3a8;
+  --badge-bg: rgba(80, 180, 120, 0.16);
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ── 기본 ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg-outer);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+a:hover {
+  color: var(--accent-strong);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 라이트 모드 드래그 색: 연한 핑크 + 진한 글자 */
+:root:not([data-theme="dark"]) ::selection {
+  background: color-mix(in srgb, var(--accent-strong) 32%, transparent);
+  color: var(--text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text);
+  line-height: 1.3;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 글 태그 (글 상단·태그 페이지 공용) */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tags a {
+  color: var(--tag);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.tags a::before {
+  content: "#";
+}
+.tags a:hover {
+  color: var(--tag);
+  text-decoration-thickness: 2px;
+}
+
+/* 목록 라벨 ("글 목록", "이 글을 언급한 글") */
+.section-label {
+  margin: 0 0 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--gray);
+}
+
+/* ── 본문(마크다운) ── */
+.prose {
+  font-size: 0.94rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.prose p {
+  margin: 1em 0;
+  color: var(--text-body);
+}
+
+/* 문단 끝에 한두 글자만 남는 줄 줄이기. word-break는 normal 그대로 (keep-all은 모바일 오른쪽 여백이 커짐) */
+.prose :is(p, li) {
+  text-wrap: pretty;
+}
+/* Safari는 pretty를 문단 전체에 적용해 한국어 줄을 일찍 끊어 오른쪽 여백이 크게 남는다.
+   hanging-punctuation은 Safari만 지원하므로 Safari 감지용으로 쓴다. */
+@supports (hanging-punctuation: first) {
+  .prose :is(p, li) {
+    text-wrap: wrap;
+  }
+}
+
+.prose :is(ul, ol) {
+  margin: 1em 0;
+  padding-left: 40px;
+}
+.prose li {
+  padding: 0.075em 0;
+}
+.prose li > :is(ul, ol) {
+  margin: 0;
+}
+
+.prose strong,
+.prose b {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* 제목: 위쪽 여백을 넓혀 앞 섹션과 구분하고 아래 본문에 붙어 보이게 */
+.prose h1 {
+  font-size: 1.4rem;
+  font-weight: 640;
+}
+.prose h2 {
+  margin: 3rem 0 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.prose h3 {
+  margin: 2.25rem 0 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.008em;
+}
+.prose :is(h4, h5, h6) {
+  margin: 1.75rem 0 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+/* 제목 바로 뒤 하위 제목(h2 → h3)은 한 묶음이라 간격을 좁게 */
+.prose :is(h2, h3, h4) + :is(h3, h4, h5, h6) {
+  margin-top: 1rem;
+}
+
+/* 제목 앵커: hover 때만 보임 */
+.prose .anchor {
+  margin-left: 0.3em;
+  color: var(--gray);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.prose :is(h1, h2, h3, h4, h5, h6):hover .anchor,
+.prose .anchor:focus-visible {
+  opacity: 1;
+}
+.prose .anchor svg {
+  position: relative;
+  top: -0.1em;
+  width: 0.9em;
+  height: 0.9em;
+  vertical-align: middle;
+}
+
+.prose .external-icon {
+  width: 0.65em;
+  height: 0.65em;
+  margin: 0 0.15em;
+  fill: currentColor;
+}
+
+.prose hr {
+  height: 1px;
+  margin: 2rem 0;
+  border: none;
+  background: var(--divider);
+}
+
+.prose img {
+  border-radius: 4px;
+}
+
+/* 인용문: 핑크 왼쪽 선 + 아주 연한 배경 */
+.prose blockquote {
+  margin: 1.25rem 0;
+  padding: 0.7rem 1.15rem;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+.prose blockquote > :first-child {
+  margin-top: 0;
+}
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* callout: 인용문과 구분되게 타입 색(--color)의 둥근 박스 */
+.prose blockquote.callout {
+  --color: #2f74e0;
+  padding: 0.8rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--color) 28%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color) 6%, transparent);
+}
+:root[data-theme="dark"] .prose blockquote.callout {
+  --color: #6ea8ff;
+}
+.prose .callout-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 0.2rem;
+  color: var(--color);
+  line-height: 1.5;
+}
+.prose .callout-title-inner {
+  font-weight: 600;
+}
+.prose .callout-title-inner > p {
+  margin: 0;
+  color: inherit;
+}
+.prose .callout-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background-color: var(--color);
+  /* lucide "info" */
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><path d='M12 16v-4'/><path d='M12 8h.01'/></svg>")
+    center / contain no-repeat;
+}
+.prose .callout-content {
+  font-size: 0.95em;
+}
+.prose .callout-content > :first-child {
+  margin-top: 0;
+}
+.prose .callout-content > :last-child {
+  margin-bottom: 0;
+}
+
+/* @YYYY-MM-DD → "추가" 날짜 뱃지 */
+.date-badge {
+  display: inline-block;
+  margin-left: 0.3em;
+  padding: 0.05em 0.55em;
+  border-radius: 999px;
+  font-size: 0.72em;
+  font-weight: 500;
+  line-height: 1.6;
+  vertical-align: 0.12em;
+  white-space: nowrap;
+  color: var(--badge-text);
+  background: var(--badge-bg);
+}
+
+/* 인라인 코드 */
+.prose :not(pre) > code {
+  padding: 0.14em 0.28em;
+  border-radius: 4px;
+  background: var(--code-inline-bg);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+/* ── 코드 블록 (Shiki 라이트/다크 두 테마) ── */
+.prose pre {
+  position: relative;
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  background: var(--code-bg);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.65;
+  overflow-x: auto;
+}
+.prose pre code {
+  font-family: inherit;
+}
+.astro-code span {
+  color: var(--shiki-light);
+}
+:root[data-theme="dark"] .astro-code span {
+  color: var(--shiki-dark);
+}
+
+/* 줄번호는 6줄 이상 블록만 (짧은 코드에선 잡음). 작고 흐리게 */
+.prose pre[data-line-numbers] {
+  padding-left: 0.75rem;
+}
+.prose pre[data-line-numbers] code {
+  counter-reset: line;
+}
+.prose pre[data-line-numbers] .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  min-width: 1.2em;
+  margin-right: 0.85rem;
+  text-align: right;
+  font-size: 0.8em;
+  color: color-mix(in srgb, var(--gray) 40%, transparent);
+}
+
+/* 언어 라벨 (우상단) */
+.prose pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-size: 0.7rem;
+  color: var(--gray);
+  pointer-events: none;
+}
+.prose pre:is([data-language="plaintext"], [data-language="text"])::before {
+  content: none;
+}
+
+/* 표: 좁은 화면에서는 가로 스크롤 */
+.prose table {
+  display: block;
+  max-width: 100%;
+  margin: 1.25rem 0;
+  border-collapse: collapse;
+  overflow-x: auto;
+  font-size: 0.95em;
+}
+.prose :is(th, td) {
+  padding: 0.4rem 0.8rem;
+  border-bottom: 1px solid var(--divider);
+  text-align: left;
+}
+.prose th {
+  font-weight: 600;
+}
+
+/* 본문 데모 박스: 실제로 동작하는 예시임을 캡션(data-label)으로 표시 */
+.prose .demo {
+  position: relative;
+  margin: 1.25rem 0;
+  padding: 1.7rem 1rem 1rem;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+}
+.prose .demo::before {
+  content: attr(data-label);
+  position: absolute;
+  top: 0.5rem;
+  left: 0.85rem;
+  font-size: 0.7rem;
+  color: var(--gray);
+}
+
+/* 문서 상단 목차: 본문 첫 목록이면서 항목이 앵커 링크면 목차로 본다 (Obsidian 목차 플러그인 출력) */
+.prose > ul:first-of-type:has(> li > a[href^="#"]) {
+  margin: 1.25rem 0 2rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--divider);
+  font-size: 0.82rem;
+  line-height: 1.95;
+  list-style: none;
+}
+.prose > ul:first-of-type:has(> li > a[href^="#"]) ul {
+  margin: 0;
+  padding-left: 1rem;
+  list-style: none;
+}
+.prose > ul:first-of-type:has(> li > a[href^="#"]) li {
+  padding: 0;
+}
+.prose > ul:first-of-type:has(> li > a[href^="#"]) a {
+  color: #9a9a9a;
+  text-decoration: underline;
+  text-decoration-color: #dcdcdc;
+  text-underline-offset: 3px;
+  transition:
+    color 0.15s ease,
+    text-decoration-color 0.15s ease;
+}
+.prose > ul:first-of-type:has(> li > a[href^="#"]) a:hover {
+  color: #454545;
+  text-decoration-color: #7a7a7a;
+}
+:root[data-theme="dark"] .prose > ul:first-of-type:has(> li > a[href^="#"]) a {
+  color: #7d7d7d;
+  text-decoration-color: #4a4a4a;
+}
+:root[data-theme="dark"] .prose > ul:first-of-type:has(> li > a[href^="#"]) a:hover {
+  color: #b9b9b9;
+  text-decoration-color: #7d7d7d;
+}
+.prose > ul:first-of-type:has(> li > a[href^="#"]) code {
+  padding: 0;
+  background: none;
+  color: inherit;
+  font-size: 0.95em;
+}
+
+/* ── 모바일 ── */
+@media (max-width: 800px) {
+  /* 목록 들여쓰기: 기본 40px가 단계마다 쌓이면 본문 폭이 너무 줄어서 단계당 1.4rem */
+  .prose :is(ul, ol) {
+    padding-left: 1.4rem;
+  }
+  /* 코드 첫 줄이 블록 폭을 다 써서 언어 라벨이 코드에 겹친다 */
+  .prose pre[data-language]::before {
+    content: none;
+  }
+}
+
+/* ── 페이지 제목 (글·태그·404 공용) ── */
+/* 사이트 헤더와 본문을 구분선으로 나누고, 제목 아래 메타(태그·날짜)는 붙여 둔다 */
+.article-title {
+  margin: 30px 0 10px;
+  padding-top: 26px;
+  border-top: 1px solid var(--divider);
+  font-size: 1.4rem;
+  font-weight: 640;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+.content-meta {
+  margin: 0.25rem 0 0.85rem;
+  font-size: 0.85rem;
+  line-height: 1.9;
+  color: var(--gray);
+}
+
+/* 본문과 하단 목록 사이 구분선 */
+.footer-divider {
+  height: 1px;
+  margin: 4rem 0 2.5rem;
+  border: none;
+  background: var(--divider);
+}
+
+@media (max-width: 800px) {
+  .article-title {
+    margin-top: 20px;
+    padding-top: 18px;
+  }
+}

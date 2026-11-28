@@ -1,6 +1,6 @@
 # Quartz → Astro 이사 계획
 
-> 작성: 2026-11-28 · 상태: 3단계 완료, 4단계 대기 (`migrate/astro`)
+> 작성: 2026-11-28 · 상태: 3단계 완료, 5단계(스타일) 진행 중 — 순서를 바꿔 스타일을 먼저 한다 (`migrate/astro`)
 
 ## 왜 옮기나
 
@@ -110,7 +110,7 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
 | 1. 뼈대      | `migrate/astro` 브랜치, Astro 설치, `content/`를 Content Collection으로 읽기, 홈과 글 페이지 최소 버전 | 미리보기 주소에서 모든 글이 열림                |
 | 2. 마크다운  | 위키링크, 줄바꿈, callout, 날짜 뱃지, 코드블록                                                         | 9개 글이 지금 사이트와 내용상 같음              |
 | 3. 연결      | 백링크, 하단 글 목록, 태그 페이지, 404                                                                 | 위키링크와 백링크가 모두 동작하고 깨진 링크 0개 |
-| 4. 부가 기능 | RSS, sitemap, OG 이미지, 검색, 다크 모드, 오노추, 맨 위로                                              | 목록의 기능이 모두 동작                         |
+| 4. 부가 기능 | RSS, sitemap, OG 이미지, 검색, 다크 모드, 오노추, 맨 위로, 코드 복사 버튼                              | 목록의 기능이 모두 동작                         |
 | 5. 스타일    | 스타일시트 새로 작성                                                                                   | PC·모바일(390px)·다크 모드, Chrome·Safari 확인  |
 | 6. 검증      | 주소 비교 스크립트, 링크 검사, RSS 검증, Lighthouse                                                    | 차이 0개                                        |
 | 7. 전환      | `main`에 머지, 배포 확인, Quartz 파일과 `upstream` 리모트 정리, `CLAUDE.md`·`.claude/rules` 갱신       | 실제 사이트 정상, 롤백 방법 확인                |
@@ -149,9 +149,18 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
   - `scripts/check-links.mjs`: 빌드 결과의 내부 링크 358개가 실제 페이지·앵커로 이어지는지 검사 → 깨진 링크 0개
   - 주소 23개 중 21개 일치. 남은 건 `/index.xml`, `/sitemap.xml` (4단계)
 
+- 2026-11-28 5단계 (4단계보다 먼저)
+  - 일반 CSS. `src/styles/global.css`(색 변수·본문·callout·코드), UI는 컴포넌트 `<style>`
+  - 기준값은 실제 사이트의 계산된 스타일과 `custom.scss`에서 뽑음. things 테마 덮어쓰기 코드는 옮기지 않고 결과값만 옮김
+  - 다크 모드 색은 `[data-theme="dark"]`. 첫 화면 깜빡임 방지 스크립트가 `localStorage.theme`(Quartz와 같은 키)을 읽는다. 토글 버튼은 4단계
+  - 읽는 시간("N min read") 추가. 8개 중 6개는 Quartz와 같고, 2개는 1~2분 차이(Quartz가 어떤 텍스트로 계산했는지 정확히 재현 못 함)
+  - 태그 목록(`/tags/`)은 칩 형태 그대로. 구분선·칩 테두리는 `--divider`
+  - 푸터 문구 "Created with Quartz" → "© 2026 Hyemin Kim"
+  - 확인: Chrome PC·모바일(390px)·다크 모드, Safari 모바일(계산값: `text-wrap: wrap`, `word-break: normal`, 가로 넘침 없음)
+
 ## 정할 것
 
-- [ ] 그래프를 계속 둘지 (지금 헤더 아이콘 → 모달)
-- [ ] 스타일 방식: 일반 CSS / SCSS / Tailwind
+- [x] 그래프: 이사에서는 빼고 이사 후에 다시 만든다. d3로 직접, astro-modular·Quartz 그래프(둘 다 MIT) 참고. 데이터는 3단계 링크 목록
+- [x] 스타일 방식: 일반 CSS
 - [ ] /now 페이지를 이사와 같이 만들지, 이사 후에 만들지
 - [ ] Obsidian에서 `[[링크]]`를 쓸 때 파일 이름이 같은 글이 생기면 어떻게 할지 (지금은 없음)

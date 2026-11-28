@@ -1,7 +1,7 @@
 ---
 import { render } from "astro:content"
 import Backlinks from "../components/Backlinks.astro"
-import RecentPosts from "../components/RecentPosts.astro"
+import PostFeed from "../components/PostFeed.astro"
 import Base from "../layouts/Base.astro"
 import { getBacklinks } from "../lib/backlinks"
 import { formatDate, getPosts } from "../lib/posts"
@@ -12,17 +12,17 @@ export async function getStaticPaths() {
   const backlinks = await getBacklinks(posts)
   return posts.map((post) => ({
     params: { slug: post.id },
-    props: { post, backlinks: backlinks.get(post.id) ?? [] },
+    props: { post, backlinks: backlinks.get(post.id) ?? [], recent: posts.slice(0, 5) },
   }))
 }
 
-const { post, backlinks } = Astro.props
-const { Content } = await render(post)
+const { post, backlinks, recent } = Astro.props
+const { Content, remarkPluginFrontmatter } = await render(post)
 ---
 
-<Base title={post.data.title} description={post.data.description}>
+<Base title={post.data.title} description={post.data.description} crumb={post.data.title}>
   <article>
-    <h1>{post.data.title}</h1>
+    <h1 class="article-title">{post.data.title}</h1>
     <ul class="tags">
       {
         post.data.tags.map((tag) => (
@@ -32,9 +32,16 @@ const { Content } = await render(post)
         ))
       }
     </ul>
-    <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
-    <Content />
+    <p class="content-meta">
+      <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>, {
+        remarkPluginFrontmatter.minutesRead
+      } min read
+    </p>
+    <div class="prose">
+      <Content />
+    </div>
   </article>
+  <hr class="footer-divider" />
+  <PostFeed posts={recent} current={post.id} compact />
   <Backlinks posts={backlinks} />
-  <RecentPosts current={post.id} />
 </Base>
