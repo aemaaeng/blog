@@ -1,0 +1,26 @@
+---
+import PostFeed from "../../components/PostFeed.astro"
+import PostList from "../../components/PostList.astro"
+import Base from "../../layouts/Base.astro"
+import { getPosts } from "../../lib/posts"
+import { groupByTag } from "../../lib/tags"
+
+export async function getStaticPaths() {
+  const posts = await getPosts()
+  const groups = groupByTag(posts)
+  return [...groups].map(([tag, tagged]) => ({
+    params: { tag },
+    props: { posts: tagged, recent: posts.slice(0, 5) },
+  }))
+}
+
+const { tag } = Astro.params
+const { posts, recent } = Astro.props
+---
+
+<Base title={tag} crumb={`#${tag}`}>
+  <h1 class="article-title">{tag}</h1>
+  <PostList posts={posts} />
+  <hr class="footer-divider" />
+  <PostFeed posts={recent} compact />
+</Base>

@@ -1,0 +1,229 @@
+---
+import { ClientRouter } from "astro:transitions"
+import CodeCopy from "../components/CodeCopy.astro"
+import Onochu from "../components/Onochu.astro"
+import Search from "../components/Search.astro"
+import ThemeToggle from "../components/ThemeToggle.astro"
+import ToTop from "../components/ToTop.astro"
+import "../styles/global.css"
+
+interface Props {
+  title: string
+  description?: string
+  /** 글 페이지 breadcrumb에 보일 현재 위치 (없으면 breadcrumb 없음) */
+  crumb?: string
+  /** 공유 미리보기 이미지 경로 (없으면 사이트 기본 이미지) */
+  image?: string
+}
+const { title, description, crumb, image = "/og/index.png" } = Astro.props
+const url = new URL(Astro.url.pathname.replace(/\.html$/, ""), Astro.site)
+const imageUrl = new URL(image, Astro.site)
+---
+
+<!doctype html>
+<html lang="ko" transition:animate="none">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={url} />
+    <link rel="icon" href="/icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="Hyemin Kim" href="/index.xml" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <meta property="og:site_name" content="Hyemin Kim" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={url} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap"
+    />
+    <!-- 첫 화면이 깜빡이지 않게 그리기 전에 테마를 정한다. 저장 키 "theme"는 Quartz 시절과 같다.
+         페이지 이동(View Transitions)은 <html> 속성을 새 문서 것으로 바꾸므로 이동 뒤에도 다시 정한다 -->
+    <script is:inline>
+      ;(() => {
+        const dark = matchMedia("(prefers-color-scheme: dark)")
+        const apply = () =>
+          (document.documentElement.dataset.theme =
+            localStorage.getItem("theme") ?? (dark.matches ? "dark" : "light"))
+        apply()
+        if (window.__theme) return
+        window.__theme = true
+        document.addEventListener("astro:after-swap", apply)
+        dark.addEventListener("change", apply) // 직접 고른 적이 없으면 시스템 설정을 따라간다
+      })()
+    </script>
+    <!-- 페이지 이동을 새로고침 없이 (Quartz SPA와 같은 동작). 이동하면 맨 위로 -->
+    <ClientRouter />
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <div class="masthead">
+          <a class="site-title" href="/">Hyemin Kim</a>
+          <div class="toolbar">
+            <Onochu />
+            <Search />
+            <ThemeToggle />
+          </div>
+        </div>
+        {
+          crumb && (
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+              <a href="/">Home</a>
+              <span class="breadcrumb-sep" aria-hidden="true">
+                ❯
+              </span>
+              <span class="breadcrumb-current">{crumb}</span>
+            </nav>
+          )
+        }
+      </header>
+      <main>
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <p>© 2026 Hyemin Kim</p>
+        <ul>
+          <li><a class="github" href="https://github.com/aemaaeng">GitHub</a></li>
+          <li><a class="linkedin" href="https://www.linkedin.com/in/hyemink3263/">LinkedIn</a></li>
+        </ul>
+        <ToTop />
+      </footer>
+    </div>
+    <CodeCopy />
+  </body>
+</html>
+
+<style>
+  /* 가운데 한 칸. 바깥은 회색, 칸은 흰색. 본문이 짧아도 푸터는 바닥에 */
+  .page {
+    display: flex;
+    flex-direction: column;
+    max-width: 760px;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 0 24px;
+    background: var(--bg);
+  }
+  main {
+    flex: 1;
+  }
+
+  .site-header {
+    margin-top: 96px;
+  }
+  .masthead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 36px;
+  }
+  /* 사이트 제목(내 이름) = 홈 링크. 위계: 사이트 제목 > 글 제목 > 라벨·날짜 */
+  .site-title {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    color: var(--text);
+  }
+  .site-title:hover {
+    color: var(--accent);
+  }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* breadcrumb: 작은 회색 경로, 현재 글만 진하게, hover 때만 강조색 */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+  }
+  .breadcrumb a {
+    color: var(--gray);
+  }
+  .breadcrumb a:hover {
+    color: var(--accent);
+  }
+  .breadcrumb-sep {
+    font-size: 0.7em;
+    color: var(--gray);
+    opacity: 0.6;
+  }
+  .breadcrumb-current {
+    color: var(--text);
+  }
+
+  .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin: 4rem 0 64px;
+    font-size: 12px;
+    color: var(--gray);
+  }
+  .site-footer p {
+    margin: 0;
+  }
+  .site-footer ul {
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* 로고 아이콘을 mask로 그려 글자색(currentColor)을 따르게 */
+  .site-footer a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .site-footer a::before {
+    content: "";
+    flex: none;
+    width: 1.05em;
+    height: 1.05em;
+    background-color: currentColor;
+    mask: var(--icon) center / contain no-repeat;
+  }
+  .github {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E");
+  }
+  .linkedin {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z'/%3E%3C/svg%3E");
+  }
+
+  @media (max-width: 800px) {
+    .site-header {
+      margin-top: 24px;
+    }
+    .site-title {
+      font-size: 1.2rem;
+    }
+    /* 긴 글 제목이 두 줄로 접히면 바로 아래 글 제목과 중복돼 보여서 한 줄 말줄임 */
+    .breadcrumb {
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+    .breadcrumb-current {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+</style>

@@ -1,6 +1,6 @@
 # Quartz → Astro 이사 계획
 
-> 작성: 2026-11-28 · 상태: 계획
+> 작성: 2026-11-28 · 상태: 1~6단계 완료, 7단계(전환) 전 (`migrate/astro`)
 
 ## 왜 옮기나
 
@@ -110,16 +110,85 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
 | 1. 뼈대      | `migrate/astro` 브랜치, Astro 설치, `content/`를 Content Collection으로 읽기, 홈과 글 페이지 최소 버전 | 미리보기 주소에서 모든 글이 열림                |
 | 2. 마크다운  | 위키링크, 줄바꿈, callout, 날짜 뱃지, 코드블록                                                         | 9개 글이 지금 사이트와 내용상 같음              |
 | 3. 연결      | 백링크, 하단 글 목록, 태그 페이지, 404                                                                 | 위키링크와 백링크가 모두 동작하고 깨진 링크 0개 |
-| 4. 부가 기능 | RSS, sitemap, OG 이미지, 검색, 다크 모드, 오노추, 맨 위로                                              | 목록의 기능이 모두 동작                         |
+| 4. 부가 기능 | RSS, sitemap, OG 이미지, 검색, 다크 모드, 오노추, 맨 위로, 코드 복사 버튼                              | 목록의 기능이 모두 동작                         |
 | 5. 스타일    | 스타일시트 새로 작성                                                                                   | PC·모바일(390px)·다크 모드, Chrome·Safari 확인  |
 | 6. 검증      | 주소 비교 스크립트, 링크 검사, RSS 검증, Lighthouse                                                    | 차이 0개                                        |
 | 7. 전환      | `main`에 머지, 배포 확인, Quartz 파일과 `upstream` 리모트 정리, `CLAUDE.md`·`.claude/rules` 갱신       | 실제 사이트 정상, 롤백 방법 확인                |
 
 1~3단계가 이사의 핵심이다. 여기까지 되면 Quartz 없이도 블로그가 돈다. 4~5단계는 나눠서 해도 된다.
 
+## 진행 기록
+
+- 2026-11-28 1단계
+  - Quartz 파일 삭제
+  - Astro 7 설치. Node 22.23 이상이 필요해서 `.node-version`을 24로 바꿈. 로컬은 `nvm use 24`
+  - `content/`를 Content Collection으로 읽음
+  - 홈과 글 페이지 최소 버전
+  - 글 주소 8개와 홈이 `docs/urls.txt`와 일치 (`node scripts/check-urls.mjs`)
+  - `content/`는 prettier 대상에서 뺌 (Obsidian이 관리)
+  - `CLAUDE.md`·`.claude/rules`는 아직 Quartz 기준이라 7단계에서 갱신
+  - 미리보기 배포 성공: https://migrate-astro.hyemin-jardin.pages.dev
+    - Cloudflare 설정: Preview branch를 Custom `migrate/*`로, **Preview 환경** `NODE_VERSION`을 24.22.3으로 (Production은 22.16.0 그대로)
+    - 환경 변수는 Production·Preview가 따로다. `NODE_VERSION` 변수가 `.node-version`보다 우선한다
+    - Retry는 첫 배포 때 설정을 재사용한다. 설정을 바꾼 뒤엔 새 커밋으로 배포한다
+    - 404.html이 없으면 Cloudflare가 없는 주소에 홈을 200으로 돌려준다. 그래서 주소 검증은 반드시 `scripts/check-urls.mjs`로 빌드 결과를 보고 한다 (3단계에서 404 페이지 추가)
+
+- 2026-11-28 2단계
+  - Astro 6도 시도했지만 파일 이름의 `?`를 못 읽는 버그(`React.lazy는 300ms 느리다?.md`)가 있어 7 유지
+  - Astro 7은 기본 마크다운 처리기가 Sätteri라, `@astrojs/markdown-remark`의 `unified()`로 remark/rehype 플러그인을 쓴다
+  - `src/markdown/`: 위키링크(못 찾으면 빌드 실패), 블록 id(`^id` → `id`), callout, 날짜 뱃지, 링크·제목 앵커. 한 줄 줄바꿈은 `remark-breaks`
+  - 화살표 변환은 하지 않는다. Quartz 설정은 켜져 있었지만 실제 사이트에서도 `->`는 그대로였다
+  - 실제 사이트와 글 8개 본문 비교: 텍스트, 줄바꿈 수, 제목 id, 블록 id, 링크, 코드 블록, 뱃지, callout 모두 일치 (표 공백 차이만 있음)
+
+- 2026-11-28 3단계
+  - 백링크: 위키링크 플러그인이 링크한 글을 `frontmatter.links`에 남기고, `render()`의 `remarkPluginFrontmatter`로 모은다. 실제 사이트와 같은 3곳
+  - 글 하단 "글 목록": 최근 5개, 지금 글은 `현재 글` 뱃지 (Quartz는 HTML에 전부 넣고 CSS로 5개만 보였음)
+  - 태그: 주소와 표시 이름 모두 slug 규칙(`Next.js` → `next.js`). 태그 10개 페이지와 `/tags/` 목록
+  - `/tags/`를 `tags/index.html`로 내려고 `build.format`을 `preserve`로 바꿈(`file`이면 `tags.html` → `/tags`가 됨). `trailingSlash`는 `ignore`
+  - 404 페이지 (Cloudflare가 없는 주소에 이 페이지를 404로 돌려준다)
+  - `scripts/check-links.mjs`: 빌드 결과의 내부 링크 358개가 실제 페이지·앵커로 이어지는지 검사 → 깨진 링크 0개
+  - 주소 23개 중 21개 일치. 남은 건 `/index.xml`, `/sitemap.xml` (4단계)
+
+- 2026-11-28 5단계 (4단계보다 먼저)
+  - 일반 CSS. `src/styles/global.css`(색 변수·본문·callout·코드), UI는 컴포넌트 `<style>`
+  - 기준값은 실제 사이트의 계산된 스타일과 `custom.scss`에서 뽑음. things 테마 덮어쓰기 코드는 옮기지 않고 결과값만 옮김
+  - 다크 모드 색은 `[data-theme="dark"]`. 첫 화면 깜빡임 방지 스크립트가 `localStorage.theme`(Quartz와 같은 키)을 읽는다. 토글 버튼은 4단계
+  - 읽는 시간("N min read") 추가. 8개 중 6개는 Quartz와 같고, 2개는 1~2분 차이(Quartz가 어떤 텍스트로 계산했는지 정확히 재현 못 함)
+  - 태그 목록(`/tags/`)은 칩 형태 그대로. 구분선·칩 테두리는 `--divider`
+  - 푸터 문구 "Created with Quartz" → "© 2026 Hyemin Kim"
+  - 확인: Chrome PC·모바일(390px)·다크 모드, Safari 모바일(계산값: `text-wrap: wrap`, `word-break: normal`, 가로 넘침 없음)
+
+- 2026-11-28 4단계
+  - RSS `/index.xml`(주소 유지)과 `/sitemap.xml`은 직접 만든 엔드포인트. Quartz RSS에는 태그 페이지가 글처럼 섞여 있었는데 새 RSS는 글만 넣는다
+  - `@astrojs/rss`는 기본값이면 일부 링크 끝에 `/`를 붙여서 `trailingSlash: false`
+  - 공유 메타(canonical, og, twitter)와 OG 이미지 `/og/<slug>.png`(홈·목록은 `/og/index.png`). satori + resvg, Pretendard를 직접 넣어서 Quartz 시절처럼 한글이 네모로 깨지지 않는다
+  - 검색: Pagefind. `npm run build`가 `astro build && pagefind --site public`. 글 본문(`data-pagefind-body`)만 색인한다. 개발 서버에서는 색인이 없어 결과가 안 나온다
+    - Quartz 검색은 글자 단위로 맞춰서 "배포"에 상관없는 글이 걸렸다. Pagefind는 단어 앞부분으로 맞춘다("캐싱" → "캐싱을", "캐싱하는")
+    - 모달 모양은 Quartz와 같다(입력 칸, 결과 목록, PC는 오른쪽 미리보기). ⌘K·`/`로 열고 ↑↓·Enter로 이동
+  - 다크 모드 토글, 페이지 이동(`<ClientRouter />`, 애니메이션 없음). 이동하면 `<html>` 속성이 바뀌므로 `astro:after-swap`에서 테마를 다시 정한다
+  - 오노추: `static/onochu.js` → `Onochu.astro`. 저장 키·형식은 같아서 그날 뽑은 곡이 이어진다. 미리보기 환경에는 Spotify Secret이 없어서 버튼이 숨겨진다(정상)
+  - 코드 블록은 빌드할 때 `div.code-block`으로 감싸고(`src/markdown/code-block.ts`) 복사 버튼을 붙인다. 마우스를 올리면 언어 라벨 대신 나온다. 터치 화면은 늘 보인다
+  - 모바일 푸터 "맨 위로" 버튼
+  - 확인: Chrome PC·모바일(390px)·다크 모드, `astro check` 오류 0, 주소 23개 일치, 깨진 링크 0개
+
+- 2026-11-28 6단계
+  - 빌드 결과: 주소 23개 일치(`check-urls`), 내부 링크 299개 깨진 것 0개(`check-links`), RSS·sitemap XML 형식 정상(`xmllint`)
+  - 미리보기 배포: 기존 주소 23개, sitemap·RSS의 링크 전부 200. `/글/`, `/글.html`, `/tags`, `/index.html`은 실제 사이트와 똑같이 308
+  - 실제 사이트에만 있던 것: Quartz가 파일 이름 대소문자를 살린 주소(`/Streaming-SSR` 등 3개)를 소문자 주소로 넘겨주고 있었다 → `_redirects`(301)로 같게 만듦. `wrangler pages dev`로 루프 없음 확인
+  - 옮기지 않은 것: 예전 공유 이미지 주소(`/static/og-image.png`, `/<글>-og-image.webp`). SNS는 다시 공유할 때 페이지의 og 태그를 읽어 새 이미지를 쓴다
+  - Lighthouse(모바일, CLI) — 실제 사이트 → 미리보기
+    | 페이지 | 성능    | 접근성  | 권장사항 | SEO      |
+    | ------ | ------- | ------- | -------- | -------- |
+    | 홈     | 64 → 98 | 96 → 95 | 100 → 96 | 100 → 66 |
+    | 글     | 75 → 94 | 94 → 89 | 100 → 96 | 100 → 66 |
+    - 글 LCP 4.4초 → 2.5초, 홈 TBT 520ms → 0ms
+    - SEO 66: 미리보기 주소는 Cloudflare가 `x-robots-tag: noindex`를 붙인다. 운영 주소에서는 없다
+    - 권장사항 96: 미리보기에 Spotify Secret이 없어 `/api/song`이 503 → 콘솔 오류. 운영에서는 없다
+    - 접근성: 분홍 링크 대비(실제 사이트도 같음), 글 안 제목 순서(h1 → h3, 글 내용이라 그대로), 내부 링크가 색으로만 구분됨 → Quartz처럼 노란 배경을 넣어 고침
+
 ## 정할 것
 
-- [ ] 그래프를 계속 둘지 (지금 헤더 아이콘 → 모달)
-- [ ] 스타일 방식: 일반 CSS / SCSS / Tailwind
+- [x] 그래프: 이사에서는 빼고 이사 후에 다시 만든다. d3로 직접, astro-modular·Quartz 그래프(둘 다 MIT) 참고. 데이터는 3단계 링크 목록
+- [x] 스타일 방식: 일반 CSS
 - [ ] /now 페이지를 이사와 같이 만들지, 이사 후에 만들지
 - [ ] Obsidian에서 `[[링크]]`를 쓸 때 파일 이름이 같은 글이 생기면 어떻게 할지 (지금은 없음)

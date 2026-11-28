@@ -1,0 +1,457 @@
+---
+// 오노추(오늘의 노래 추천) 위젯. 헤더의 "오노추?" 버튼 → 팝오버: [노래 추천받기] → 커버가 슬롯처럼 돌다가 한 곡 공개.
+// 곡 데이터는 /api/song(Cloudflare Pages Function, functions/api/song.js)에서 받는다.
+// 로컬(API 없음)에서는 MOCK을 쓰고, 실제 사이트에서 API가 실패하면(토큰 만료 등) 버튼을 숨긴 채로 둔다.
+---
+
+<div class="onochu" hidden>
+  <button class="onochu-trigger" type="button" aria-expanded="false">
+    <!-- ♪ 문자는 Safari에서 대체 폰트로 작게 그려져서 SVG로 그린다 -->
+    <svg class="onochu-note" viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M8.5 1.5v8.6A2.75 2.75 0 1 0 10 12.5V4.6c1.8.5 2.9 1.7 3.2 3.6.9-3.1-1-5.6-4.7-6.7z"
+      ></path>
+    </svg>오노추?
+  </button>
+  <div class="onochu-panel" hidden></div>
+</div>
+
+<script>
+  type Track = { name: string; artist: string; url: string; image?: string; color?: string }
+
+  const MOCK: Track[] = [
+    { name: "Uchida 1", artist: "GINTA & Odakei", url: "https://open.spotify.com/", color: "#c9b79c" },
+    { name: "Supernova", artist: "aespa", url: "https://open.spotify.com/", color: "#8fb3d9" },
+    { name: "Ditto", artist: "NewJeans", url: "https://open.spotify.com/", color: "#b9d3c2" },
+    { name: "Love wins all", artist: "IU", url: "https://open.spotify.com/", color: "#d9a7b0" },
+    { name: "Hype Boy", artist: "NewJeans", url: "https://open.spotify.com/", color: "#e3d08f" },
+    { name: "밤양갱", artist: "비비 (BIBI)", url: "https://open.spotify.com/", color: "#a99bd1" },
+  ]
+
+  const DEV = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
+
+  // 오늘 뽑기 상태: 곡 순서를 섞어 겹치지 않게 하나씩 꺼내고, 다 꺼내면 끝.
+  // 브라우저에 그날 하루만 저장(새로고침·페이지 이동해도 이어짐, 날짜가 바뀌면 초기화).
+  // 저장 형식: { date, tracks(그날 받은 20곡), deck, pos } — Quartz 시절과 같은 키·형식
+  // /api/song은 요청마다 다른 20곡을 주므로, 그날은 처음 받은 묶음을 그대로 이어 쓴다.
+  const KEY = "onochu"
+  let tracks: Track[] | null = null
+  let deck: number[] = [] // 섞인 곡 인덱스
+  let pos = 0 // 다음에 꺼낼 위치 = 지금까지 뽑은 개수
+  let loading: Promise<Track[] | null> | null = null
+
+  function today() {
+    const d = new Date()
+    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
+  }
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ date: today(), tracks, deck, pos }))
+    } catch {}
+  }
+  function stored() {
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY) || "null")
+      if (s && s.date === today() && s.tracks?.length) return s
+    } catch {}
+    return null
+  }
+  function fresh() {
+    deck = tracks!.map((_, i) => i)
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[deck[i], deck[j]] = [deck[j], deck[i]]
+    }
+    pos = 0
+    save()
+  }
+
+  function load() {
+    if (loading) return loading
+    const s = stored()
+    if (s) {
+      ;({ tracks, deck, pos } = s)
+      return (loading = Promise.resolve(tracks))
+    }
+    loading = fetch("/api/song")
+      .then((r) => {
+        if (!r.ok) throw new Error(String(r.status))
+        return r.json()
+      })
+      .then((d) => {
+        if (!d?.tracks?.length) throw new Error("empty")
+        tracks = d.tracks
+      })
+      .catch(() => {
+        tracks = DEV ? MOCK : null
+      })
+      .then(() => {
+        if (tracks) fresh()
+        return tracks
+      })
+    return loading
+  }
+
+  const drawn = () => deck.slice(0, pos).map((i) => tracks![i])
+  function draw() {
+    const t = tracks![deck[pos]]
+    pos++
+    save()
+    return t
+  }
+
+  function cover(t: Track) {
+    const el = document.createElement("div")
+    el.className = "onochu-cover"
+    if (t.image) {
+      const img = document.createElement("img")
+      img.src = t.image
+      img.alt = ""
+      el.append(img)
+    } else {
+      el.style.background = t.color || "var(--bg-hover)"
+    }
+    return el
+  }
+
+  function trackLink(t: Track, cls: string) {
+    const row = document.createElement("a")
+    row.className = cls
+    row.href = t.url
+    row.target = "_blank"
+    row.rel = "noopener"
+    const meta = document.createElement("div")
+    meta.className = "onochu-meta"
+    const name = document.createElement("strong")
+    name.textContent = t.name
+    const artist = document.createElement("span")
+    artist.textContent = t.artist
+    meta.append(name, artist)
+    row.append(cover(t), meta)
+    return row
+  }
+
+  function button(text: string, act: string, ghost = false) {
+    const b = document.createElement("button")
+    b.type = "button"
+    b.className = "onochu-btn" + (ghost ? " onochu-btn-ghost" : "")
+    b.dataset.act = act
+    b.textContent = text
+    return b
+  }
+
+  function render(panel: HTMLElement, state: string, t?: Track) {
+    panel.innerHTML = ""
+    panel.dataset.state = state
+    if (state === "idle") {
+      panel.innerHTML =
+        '<p class="onochu-title">오늘의 노래 추천</p>' +
+        '<p class="onochu-sub">제 좋아요 리스트에서 골라드려요</p>'
+      panel.append(button("노래 추천받기", "roll"))
+      return
+    }
+    if (state === "rolling") {
+      const slot = document.createElement("div")
+      slot.className = "onochu-slot"
+      panel.append(slot)
+      let n = 0
+      const timer = setInterval(() => {
+        slot.replaceChildren(cover(tracks![n++ % tracks!.length]))
+      }, 80)
+      setTimeout(() => {
+        clearInterval(timer)
+        render(panel, "result", draw())
+      }, 900)
+      return
+    }
+    if (state === "result" && t) {
+      const row = trackLink(t, "onochu-track")
+      const listen = document.createElement("span")
+      listen.className = "onochu-listen"
+      listen.textContent = "Spotify에서 듣기 ↗"
+      row.querySelector(".onochu-meta")!.append(listen)
+      panel.append(row)
+      const left = deck.length - pos
+      panel.append(
+        button(left > 0 ? "다른 곡" : "오늘의 마지막 곡이에요", left > 0 ? "roll" : "end", true),
+      )
+      return
+    }
+    if (state === "end") {
+      panel.innerHTML =
+        '<p class="onochu-title">오늘 준비한 곡은 여기까지예요</p>' +
+        '<p class="onochu-sub">내일 새 곡으로 채워둘게요 ♪︎</p>'
+      panel.append(button(`추천받은 곡 보기 (${pos})`, "list"))
+      return
+    }
+    // list: 오늘 추천받은 곡 (최근 것부터)
+    const head = document.createElement("p")
+    head.className = "onochu-title onochu-list-title"
+    head.textContent = `오늘 추천받은 곡 ${pos}`
+    const list = document.createElement("div")
+    list.className = "onochu-list"
+    for (const x of drawn().reverse()) list.append(trackLink(x, "onochu-list-item"))
+    panel.append(head, list)
+  }
+
+  // 패널을 열 때 보여줄 화면: 다 뽑은 날이면 끝 화면, 아니면 처음 화면
+  function entry(panel: HTMLElement) {
+    load().then(() => {
+      if (pos >= deck.length) render(panel, "end")
+      else if (!panel.dataset.state || panel.dataset.state === "end") render(panel, "idle")
+    })
+  }
+
+  function roll(panel: HTMLElement) {
+    load().then(() => {
+      if (pos >= deck.length) return render(panel, "end")
+      if (reduce) render(panel, "result", draw())
+      else render(panel, "rolling")
+    })
+  }
+
+  function closeAll() {
+    document.querySelectorAll<HTMLElement>(".onochu-panel").forEach((p) => (p.hidden = true))
+    document
+      .querySelectorAll(".onochu-trigger")
+      .forEach((b) => b.setAttribute("aria-expanded", "false"))
+  }
+
+  // 페이지 이동(View Transitions)마다 헤더가 새로 그려지므로, 곡을 받을 수 있으면 버튼을 보인다
+  document.addEventListener("astro:page-load", () => {
+    load().then((t) => {
+      const el = document.querySelector<HTMLElement>(".onochu")
+      if (el && t) el.hidden = false
+    })
+  })
+
+  // 이벤트는 문서 단위로 한 번만 건다 (페이지가 바뀌어도 그대로 동작)
+  const mobile = matchMedia("(max-width: 800px)")
+  let openedAt: number | null = null
+  document.addEventListener("click", (e) => {
+    const target = e.target as Element
+    const trigger = target.closest?.(".onochu-trigger")
+    if (trigger) {
+      const panel = trigger.parentElement!.querySelector<HTMLElement>(".onochu-panel")!
+      const open = panel.hidden
+      panel.hidden = !open
+      trigger.setAttribute("aria-expanded", String(open))
+      if (open) {
+        openedAt = scrollY
+        entry(panel)
+      }
+      return
+    }
+    const panel = target.closest?.<HTMLElement>(".onochu-panel")
+    if (!panel) return closeAll() // 바깥 클릭
+    const act = target.closest<HTMLElement>("[data-act]")?.dataset.act
+    if (act === "roll") roll(panel)
+    else if (act === "end") render(panel, "end")
+    else if (act === "list") render(panel, "list")
+  })
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAll()
+  })
+  // 모바일: 패널이 화면에 고정(fixed)이라 스크롤하면 버튼과 떨어진 채 본문을 가린다 → 스크롤하면 닫는다.
+  // 열 때 생기는 미세한 흔들림은 무시하도록 40px 이상 움직였을 때만. PC는 패널이 헤더를 따라가므로 그대로 둔다.
+  addEventListener(
+    "scroll",
+    () => {
+      if (!mobile.matches || openedAt === null) return
+      if (!document.querySelector(".onochu-panel:not([hidden])")) return (openedAt = null)
+      if (Math.abs(scrollY - openedAt) > 40) {
+        closeAll()
+        openedAt = null
+      }
+    },
+    { passive: true },
+  )
+  document.addEventListener("astro:before-swap", closeAll)
+</script>
+
+<style is:global>
+  /* 패널 안 요소는 스크립트가 만들어서 전역 스타일로 둔다 (클래스는 onochu- 로 시작) */
+  .onochu {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .onochu[hidden] {
+    display: none;
+  }
+  .onochu-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    height: 32px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--divider);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+  .onochu-note {
+    width: 0.95em;
+    height: 0.95em;
+    fill: currentColor;
+  }
+  .onochu-trigger:hover,
+  .onochu-trigger[aria-expanded="true"] {
+    background: var(--bg-hover);
+  }
+  .onochu-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 50;
+    width: 280px;
+    padding: 1.1rem;
+    border: 1px solid var(--divider);
+    border-radius: 12px;
+    background: var(--bg);
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .onochu-panel[hidden] {
+    display: none;
+  }
+  .onochu-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .onochu-sub {
+    margin: 0.25rem 0 0.9rem;
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+  .onochu-btn {
+    width: 100%;
+    height: 38px;
+    border: none;
+    border-radius: 8px;
+    background: var(--text);
+    color: var(--bg);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .onochu-btn-ghost {
+    margin-top: 0.75rem;
+    background: var(--bg-hover);
+    color: var(--text);
+  }
+  .onochu-cover {
+    flex: none;
+    width: 64px;
+    height: 64px;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .onochu-cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .onochu-slot {
+    display: flex;
+    justify-content: center;
+    padding: 1.2rem 0;
+  }
+  .onochu-slot .onochu-cover {
+    width: 96px;
+    height: 96px;
+  }
+  .onochu-track {
+    display: flex;
+    gap: 0.85rem;
+    align-items: center;
+    text-align: left;
+    color: inherit;
+    text-decoration: none;
+    animation: onochu-pop 0.25s ease;
+  }
+  .onochu-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.1rem;
+  }
+  .onochu-meta strong {
+    overflow: hidden;
+    font-size: 0.95rem;
+    color: var(--text);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .onochu-meta span {
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+  .onochu-meta .onochu-listen {
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+    color: #1db954; /* Spotify 출처 표시 */
+  }
+  .onochu-panel[data-state="list"] {
+    text-align: left;
+  }
+  .onochu-list-title {
+    margin-bottom: 0.6rem;
+  }
+  .onochu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    max-height: 300px;
+    margin: 0 -0.4rem;
+    overflow-y: auto;
+  }
+  .onochu-list-item {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+    padding: 0.35rem 0.4rem;
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .onochu-list-item:hover {
+    background: var(--bg-hover);
+  }
+  .onochu-list-item .onochu-cover {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+  }
+  .onochu-list-item .onochu-meta strong {
+    font-size: 0.85rem;
+  }
+  .onochu-list-item .onochu-meta span {
+    font-size: 0.75rem;
+  }
+  @keyframes onochu-pop {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+  @media (max-width: 800px) {
+    .onochu-panel {
+      position: fixed;
+      top: 72px;
+      left: 16px;
+      right: 16px;
+      width: auto;
+    }
+  }
+</style>

@@ -1,3 +1,5 @@
 public
 node_modules
-.quartz-cache
+.astro
+# 글은 Obsidian에서 관리하므로 포맷하지 않는다
+content
