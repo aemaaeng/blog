@@ -1,7 +1,10 @@
 ---
 import { ClientRouter } from "astro:transitions"
+import CodeCopy from "../components/CodeCopy.astro"
+import Onochu from "../components/Onochu.astro"
 import Search from "../components/Search.astro"
 import ThemeToggle from "../components/ThemeToggle.astro"
+import ToTop from "../components/ToTop.astro"
 import "../styles/global.css"
 
 interface Props {
@@ -67,6 +70,7 @@ const imageUrl = new URL(image, Astro.site)
         <div class="masthead">
           <a class="site-title" href="/">Hyemin Kim</a>
           <div class="toolbar">
+            <Onochu />
             <Search />
             <ThemeToggle />
           </div>
@@ -92,8 +96,10 @@ const imageUrl = new URL(image, Astro.site)
           <li><a class="github" href="https://github.com/aemaaeng">GitHub</a></li>
           <li><a class="linkedin" href="https://www.linkedin.com/in/hyemink3263/">LinkedIn</a></li>
         </ul>
+        <ToTop />
       </footer>
     </div>
+    <CodeCopy />
   </body>
 </html>
 

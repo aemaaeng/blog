@@ -3,6 +3,7 @@ import { unified } from "@astrojs/markdown-remark"
 import { defineConfig } from "astro/config"
 import remarkBreaks from "remark-breaks"
 import remarkBlockIds from "./src/markdown/block-ids"
+import rehypeCodeBlock from "./src/markdown/code-block"
 import remarkCallouts from "./src/markdown/callouts"
 import remarkDateBadge from "./src/markdown/date-badge"
 import remarkReadingTime from "./src/markdown/reading-time"
@@ -30,7 +31,7 @@ export default defineConfig({
         remarkBreaks, // Obsidian처럼 한 줄 줄바꿈 = <br>
         remarkReadingTime,
       ],
-      rehypePlugins: [rehypeLinks],
+      rehypePlugins: [rehypeLinks, rehypeCodeBlock],
     }),
     shikiConfig: {
       themes: { light: "github-light", dark: "github-dark" },

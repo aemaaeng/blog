@@ -1,0 +1,50 @@
+---
+// 모바일 푸터의 "맨 위로" 버튼. 긴 글 끝에서 위로 돌아갈 수단. PC는 헤더가 가까워 숨긴다.
+---
+
+<button class="to-top" type="button" aria-label="맨 위로">
+  <svg
+    viewBox="0 0 24 24"
+    width="18"
+    height="18"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"><path d="M12 19V5"></path><path d="M5 12l7-7 7 7"></path></svg
+  >
+</button>
+
+<script>
+  document.addEventListener("click", (e) => {
+    if (!(e.target as Element).closest?.(".to-top")) return
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
+    scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" })
+  })
+</script>
+
+<style>
+  .to-top {
+    display: none;
+  }
+  @media (max-width: 800px) {
+    .to-top {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      margin-left: auto;
+      padding: 0;
+      border: 1px solid var(--divider);
+      border-radius: 999px;
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+    }
+    .to-top:active {
+      background: var(--bg-hover);
+    }
+  }
+</style>

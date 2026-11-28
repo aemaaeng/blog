@@ -1,0 +1,36 @@
+---
+// 코드 블록 복사 버튼. 버튼은 페이지가 뜰 때마다(View Transitions 포함) 코드 블록에 붙인다.
+// 줄번호는 CSS(::before)로 그려서 복사되는 글자에 들어가지 않는다.
+---
+
+<script>
+  function addButtons() {
+    for (const block of document.querySelectorAll(".prose .code-block")) {
+      if (block.querySelector(".copy-button")) continue
+      const button = document.createElement("button")
+      button.type = "button"
+      button.className = "copy-button"
+      button.setAttribute("aria-label", "코드 복사")
+      block.append(button)
+    }
+  }
+  document.addEventListener("astro:page-load", addButtons)
+
+  document.addEventListener("click", async (e) => {
+    const button = (e.target as Element).closest?.<HTMLButtonElement>(".copy-button")
+    if (!button) return
+    const code = button.parentElement?.querySelector("pre code")
+    if (!code) return
+    try {
+      await navigator.clipboard.writeText(code.textContent ?? "")
+    } catch {
+      return // 권한이 없거나 안전하지 않은 주소(http)면 조용히 넘어간다
+    }
+    button.classList.add("is-copied")
+    button.setAttribute("aria-label", "복사됨")
+    setTimeout(() => {
+      button.classList.remove("is-copied")
+      button.setAttribute("aria-label", "코드 복사")
+    }, 1500)
+  })
+</script>
