@@ -271,10 +271,9 @@ plugins:
       position: beforeBody
       priority: 15
       display: all
-  - source:
-      name: quartz-themes
-      repo: github:saberzero1/quartz-themes
-      subdir: plugin
+  # 테마: upstream(saberzero1/quartz-themes)이 2026-11-26에 plugin/ 폴더를 없애 설치가 깨져서
+  # 마지막으로 동작하던 버전(945135e)의 빌드 결과와 things 테마 데이터만 plugins/에 고정해 둠
+  - source: ./plugins/quartz-themes
     enabled: true
     options:
       theme: things
