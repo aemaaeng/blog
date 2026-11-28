@@ -1,6 +1,6 @@
 # Quartz → Astro 이사 계획
 
-> 작성: 2026-11-28 · 상태: 2단계 완료, 3단계 대기 (`migrate/astro`)
+> 작성: 2026-11-28 · 상태: 3단계 완료, 4단계 대기 (`migrate/astro`)
 
 ## 왜 옮기나
 
@@ -139,6 +139,15 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
   - `src/markdown/`: 위키링크(못 찾으면 빌드 실패), 블록 id(`^id` → `id`), callout, 날짜 뱃지, 링크·제목 앵커. 한 줄 줄바꿈은 `remark-breaks`
   - 화살표 변환은 하지 않는다. Quartz 설정은 켜져 있었지만 실제 사이트에서도 `->`는 그대로였다
   - 실제 사이트와 글 8개 본문 비교: 텍스트, 줄바꿈 수, 제목 id, 블록 id, 링크, 코드 블록, 뱃지, callout 모두 일치 (표 공백 차이만 있음)
+
+- 2026-11-28 3단계
+  - 백링크: 위키링크 플러그인이 링크한 글을 `frontmatter.links`에 남기고, `render()`의 `remarkPluginFrontmatter`로 모은다. 실제 사이트와 같은 3곳
+  - 글 하단 "글 목록": 최근 5개, 지금 글은 `현재 글` 뱃지 (Quartz는 HTML에 전부 넣고 CSS로 5개만 보였음)
+  - 태그: 주소와 표시 이름 모두 slug 규칙(`Next.js` → `next.js`). 태그 10개 페이지와 `/tags/` 목록
+  - `/tags/`를 `tags/index.html`로 내려고 `build.format`을 `preserve`로 바꿈(`file`이면 `tags.html` → `/tags`가 됨). `trailingSlash`는 `ignore`
+  - 404 페이지 (Cloudflare가 없는 주소에 이 페이지를 404로 돌려준다)
+  - `scripts/check-links.mjs`: 빌드 결과의 내부 링크 358개가 실제 페이지·앵커로 이어지는지 검사 → 깨진 링크 0개
+  - 주소 23개 중 21개 일치. 남은 건 `/index.xml`, `/sitemap.xml` (4단계)
 
 ## 정할 것
 

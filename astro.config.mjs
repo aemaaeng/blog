@@ -14,9 +14,9 @@ export default defineConfig({
   // 그래서 Astro의 정적 파일 입력 폴더는 static으로 바꾼다.
   outDir: "./public",
   publicDir: "./static",
-  // Quartz와 같은 주소 형식: /<slug> 가 <slug>.html 로 나온다
-  build: { format: "file" },
-  trailingSlash: "never",
+  // Quartz와 같은 주소 형식: 글은 <slug>.html(/<slug>), 태그 목록은 tags/index.html(/tags/)
+  build: { format: "preserve" },
+  trailingSlash: "ignore",
   markdown: {
     // Obsidian 문법을 remark/rehype 플러그인으로 처리하므로 unified 처리기를 쓴다
     // (Astro 7 기본 처리기 Sätteri는 remark 플러그인을 받지 않음)

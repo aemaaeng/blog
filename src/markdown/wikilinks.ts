@@ -1,5 +1,6 @@
 // Obsidian 위키링크 [[글 제목]], [[글 제목|별칭]], [[글 제목#^블록id]], [[글 제목#제목]] → 일반 링크
 // 글은 파일 이름으로 찾는다(Obsidian처럼 대소문자 무시). 못 찾으면 빌드를 실패시켜 깨진 링크를 막는다.
+// 링크한 글 slug 목록은 frontmatter.links에 남겨 백링크를 만들 때 쓴다(render()의 remarkPluginFrontmatter).
 import { readdirSync } from "node:fs"
 import GithubSlugger from "github-slugger"
 import type { Link, PhrasingContent, Root, Text } from "mdast"
@@ -30,6 +31,7 @@ function anchorOf(hash: string | undefined) {
 export default function remarkWikilinks({ dir = "./content" } = {}) {
   const index = postIndex(dir)
   return (tree: Root, file: VFile) => {
+    const links = new Set<string>()
     visit(tree, "text", (node: Text, i, parent) => {
       if (!parent || i === undefined || !node.value.includes("[[")) return
       const out: PhrasingContent[] = []
@@ -41,6 +43,7 @@ export default function remarkWikilinks({ dir = "./content" } = {}) {
         const target = rawTarget.trim().normalize("NFC")
         const slug = index.get(target.toLowerCase())
         if (!slug) throw new Error(`${file.path}: 위키링크 대상 글을 찾을 수 없습니다: ${whole}`)
+        links.add(slug)
         if (m.index > last) out.push({ type: "text", value: node.value.slice(last, m.index) })
         const link: Link = {
           type: "link",
@@ -56,5 +59,7 @@ export default function remarkWikilinks({ dir = "./content" } = {}) {
       parent.children.splice(i, 1, ...out)
       return i + out.length
     })
+    file.data.astro ??= {}
+    file.data.astro.frontmatter = { ...file.data.astro.frontmatter, links: [...links] }
   }
 }

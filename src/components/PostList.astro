@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from "astro:content"
+import { formatDate } from "../lib/posts"
+import { tagSlug } from "../lib/tags"
+
+// 태그 페이지용 목록: 날짜, 제목, 태그
+interface Props {
+  posts: CollectionEntry<"posts">[]
+}
+const { posts } = Astro.props
+---
+
+<p>{posts.length}건의 항목</p>
+<ul class="post-list">
+  {
+    posts.map((post) => (
+      <li>
+        <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+        <h3>
+          <a href={`/${post.id}`}>{post.data.title}</a>
+        </h3>
+        <ul class="tags">
+          {post.data.tags.map((tag) => (
+            <li>
+              <a href={`/tags/${tagSlug(tag)}`}>{tagSlug(tag)}</a>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))
+  }
+</ul>

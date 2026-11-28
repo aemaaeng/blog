@@ -1,0 +1,24 @@
+---
+import type { CollectionEntry } from "astro:content"
+
+// 언급한 글이 없으면 아무것도 그리지 않는다 (Quartz hideWhenEmpty와 같음)
+interface Props {
+  posts: CollectionEntry<"posts">[]
+}
+const { posts } = Astro.props
+---
+
+{
+  posts.length > 0 && (
+    <section class="backlinks">
+      <h2>이 글을 언급한 글</h2>
+      <ul>
+        {posts.map((post) => (
+          <li>
+            <a href={`/${post.id}`}>{post.data.title}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
