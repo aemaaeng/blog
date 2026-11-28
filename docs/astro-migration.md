@@ -1,6 +1,6 @@
 # Quartz → Astro 이사 계획
 
-> 작성: 2026-11-28 · 상태: 1~5단계 완료, 6단계(검증) 전 (`migrate/astro`)
+> 작성: 2026-11-28 · 상태: 1~6단계 완료, 7단계(전환) 전 (`migrate/astro`)
 
 ## 왜 옮기나
 
@@ -170,6 +170,21 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
   - 코드 블록은 빌드할 때 `div.code-block`으로 감싸고(`src/markdown/code-block.ts`) 복사 버튼을 붙인다. 마우스를 올리면 언어 라벨 대신 나온다. 터치 화면은 늘 보인다
   - 모바일 푸터 "맨 위로" 버튼
   - 확인: Chrome PC·모바일(390px)·다크 모드, `astro check` 오류 0, 주소 23개 일치, 깨진 링크 0개
+
+- 2026-11-28 6단계
+  - 빌드 결과: 주소 23개 일치(`check-urls`), 내부 링크 299개 깨진 것 0개(`check-links`), RSS·sitemap XML 형식 정상(`xmllint`)
+  - 미리보기 배포: 기존 주소 23개, sitemap·RSS의 링크 전부 200. `/글/`, `/글.html`, `/tags`, `/index.html`은 실제 사이트와 똑같이 308
+  - 실제 사이트에만 있던 것: Quartz가 파일 이름 대소문자를 살린 주소(`/Streaming-SSR` 등 3개)를 소문자 주소로 넘겨주고 있었다 → `_redirects`(301)로 같게 만듦. `wrangler pages dev`로 루프 없음 확인
+  - 옮기지 않은 것: 예전 공유 이미지 주소(`/static/og-image.png`, `/<글>-og-image.webp`). SNS는 다시 공유할 때 페이지의 og 태그를 읽어 새 이미지를 쓴다
+  - Lighthouse(모바일, CLI) — 실제 사이트 → 미리보기
+    | 페이지 | 성능    | 접근성  | 권장사항 | SEO      |
+    | ------ | ------- | ------- | -------- | -------- |
+    | 홈     | 64 → 98 | 96 → 95 | 100 → 96 | 100 → 66 |
+    | 글     | 75 → 94 | 94 → 89 | 100 → 96 | 100 → 66 |
+    - 글 LCP 4.4초 → 2.5초, 홈 TBT 520ms → 0ms
+    - SEO 66: 미리보기 주소는 Cloudflare가 `x-robots-tag: noindex`를 붙인다. 운영 주소에서는 없다
+    - 권장사항 96: 미리보기에 Spotify Secret이 없어 `/api/song`이 503 → 콘솔 오류. 운영에서는 없다
+    - 접근성: 분홍 링크 대비(실제 사이트도 같음), 글 안 제목 순서(h1 → h3, 글 내용이라 그대로), 내부 링크가 색으로만 구분됨 → Quartz처럼 노란 배경을 넣어 고침
 
 ## 정할 것
 
