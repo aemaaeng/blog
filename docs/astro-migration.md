@@ -1,6 +1,6 @@
 # Quartz → Astro 이사 계획
 
-> 작성: 2026-11-28 · 상태: 1단계 완료, 2단계 대기 (`migrate/astro`)
+> 작성: 2026-11-28 · 상태: 2단계 완료, 3단계 대기 (`migrate/astro`)
 
 ## 왜 옮기나
 
@@ -132,6 +132,13 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
     - 환경 변수는 Production·Preview가 따로다. `NODE_VERSION` 변수가 `.node-version`보다 우선한다
     - Retry는 첫 배포 때 설정을 재사용한다. 설정을 바꾼 뒤엔 새 커밋으로 배포한다
     - 404.html이 없으면 Cloudflare가 없는 주소에 홈을 200으로 돌려준다. 그래서 주소 검증은 반드시 `scripts/check-urls.mjs`로 빌드 결과를 보고 한다 (3단계에서 404 페이지 추가)
+
+- 2026-11-28 2단계
+  - Astro 6도 시도했지만 파일 이름의 `?`를 못 읽는 버그(`React.lazy는 300ms 느리다?.md`)가 있어 7 유지
+  - Astro 7은 기본 마크다운 처리기가 Sätteri라, `@astrojs/markdown-remark`의 `unified()`로 remark/rehype 플러그인을 쓴다
+  - `src/markdown/`: 위키링크(못 찾으면 빌드 실패), 블록 id(`^id` → `id`), callout, 날짜 뱃지, 링크·제목 앵커. 한 줄 줄바꿈은 `remark-breaks`
+  - 화살표 변환은 하지 않는다. Quartz 설정은 켜져 있었지만 실제 사이트에서도 `->`는 그대로였다
+  - 실제 사이트와 글 8개 본문 비교: 텍스트, 줄바꿈 수, 제목 id, 블록 id, 링크, 코드 블록, 뱃지, callout 모두 일치 (표 공백 차이만 있음)
 
 ## 정할 것
 
