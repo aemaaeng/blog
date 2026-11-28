@@ -1,6 +1,6 @@
 # Quartz → Astro 이사 계획
 
-> 작성: 2026-11-28 · 상태: 3단계 완료, 5단계(스타일) 진행 중 — 순서를 바꿔 스타일을 먼저 한다 (`migrate/astro`)
+> 작성: 2026-11-28 · 상태: 1~5단계 완료, 6단계(검증) 전 (`migrate/astro`)
 
 ## 왜 옮기나
 
@@ -157,6 +157,19 @@ frontmatter는 `title`, `date`, `description`, `tags`, `draft`만 쓴다. 이 �
   - 태그 목록(`/tags/`)은 칩 형태 그대로. 구분선·칩 테두리는 `--divider`
   - 푸터 문구 "Created with Quartz" → "© 2026 Hyemin Kim"
   - 확인: Chrome PC·모바일(390px)·다크 모드, Safari 모바일(계산값: `text-wrap: wrap`, `word-break: normal`, 가로 넘침 없음)
+
+- 2026-11-28 4단계
+  - RSS `/index.xml`(주소 유지)과 `/sitemap.xml`은 직접 만든 엔드포인트. Quartz RSS에는 태그 페이지가 글처럼 섞여 있었는데 새 RSS는 글만 넣는다
+  - `@astrojs/rss`는 기본값이면 일부 링크 끝에 `/`를 붙여서 `trailingSlash: false`
+  - 공유 메타(canonical, og, twitter)와 OG 이미지 `/og/<slug>.png`(홈·목록은 `/og/index.png`). satori + resvg, Pretendard를 직접 넣어서 Quartz 시절처럼 한글이 네모로 깨지지 않는다
+  - 검색: Pagefind. `npm run build`가 `astro build && pagefind --site public`. 글 본문(`data-pagefind-body`)만 색인한다. 개발 서버에서는 색인이 없어 결과가 안 나온다
+    - Quartz 검색은 글자 단위로 맞춰서 "배포"에 상관없는 글이 걸렸다. Pagefind는 단어 앞부분으로 맞춘다("캐싱" → "캐싱을", "캐싱하는")
+    - 모달 모양은 Quartz와 같다(입력 칸, 결과 목록, PC는 오른쪽 미리보기). ⌘K·`/`로 열고 ↑↓·Enter로 이동
+  - 다크 모드 토글, 페이지 이동(`<ClientRouter />`, 애니메이션 없음). 이동하면 `<html>` 속성이 바뀌므로 `astro:after-swap`에서 테마를 다시 정한다
+  - 오노추: `static/onochu.js` → `Onochu.astro`. 저장 키·형식은 같아서 그날 뽑은 곡이 이어진다. 미리보기 환경에는 Spotify Secret이 없어서 버튼이 숨겨진다(정상)
+  - 코드 블록은 빌드할 때 `div.code-block`으로 감싸고(`src/markdown/code-block.ts`) 복사 버튼을 붙인다. 마우스를 올리면 언어 라벨 대신 나온다. 터치 화면은 늘 보인다
+  - 모바일 푸터 "맨 위로" 버튼
+  - 확인: Chrome PC·모바일(390px)·다크 모드, `astro check` 오류 0, 주소 23개 일치, 깨진 링크 0개
 
 ## 정할 것
 
